@@ -1,0 +1,11 @@
+D:\Visual Studio\Projects\GETest\GETest\bin\Debug\GETest.exe.config
+D:\Visual Studio\Projects\GETest\GETest\bin\Debug\GETest.exe
+D:\Visual Studio\Projects\GETest\GETest\bin\Debug\GETest.pdb
+D:\Visual Studio\Projects\GETest\GETest\bin\Debug\Skybound.Gecko.dll
+D:\Visual Studio\Projects\GETest\GETest\bin\Debug\Skybound.Gecko.xml
+D:\Visual Studio\Projects\GETest\GETest\obj\Debug\GETest.csprojResolveAssemblyReference.cache
+D:\Visual Studio\Projects\GETest\GETest\obj\Debug\GETest.Properties.Resources.resources
+D:\Visual Studio\Projects\GETest\GETest\obj\Debug\GETest.csproj.GenerateResource.Cache
+D:\Visual Studio\Projects\GETest\GETest\obj\Debug\GETest.exe
+D:\Visual Studio\Projects\GETest\GETest\obj\Debug\GETest.pdb
+D:\Visual Studio\Projects\GETest\GETest\obj\Debug\GETest.MainForm.resources

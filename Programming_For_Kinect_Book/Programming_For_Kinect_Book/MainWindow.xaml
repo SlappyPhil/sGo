@@ -1,0 +1,13 @@
+﻿<Window x:Class="Programming_For_Kinect_Book.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="600" Width="800" Loaded="Window_Loaded">
+    <Viewbox Margin="5" Grid.RowSpan="5">
+        <Grid>
+            <Image x:Name="kinectDisplay" Source="{Binding Bitmap}"></Image>
+            <Canvas x:Name="skeletonCanvas"></Canvas>
+            <Canvas x:Name="gestureCanvas"></Canvas>
+        </Grid>
+    </Viewbox>
+
+</Window>

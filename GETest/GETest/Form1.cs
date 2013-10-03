@@ -15,7 +15,7 @@ namespace GETest
         public MainForm()
         {
             InitializeComponent();
-            Skybound.Gecko.Xpcom.Initialize(@"D:\xulrunner-1.9.1.1.en-US.win32\xulrunner\");
+            Skybound.Gecko.Xpcom.Initialize(@"C:\Users\Jake\Dropbox\UF\Semesters\13 Fall\NUI\Project\GeckoFX\xulrunner-1.9.1.2.en-US.win32\xulrunner\");
             geckoWebBrowser1.BackColor = Color.White;
             geckoWebBrowser1.NoDefaultContextMenu = true;
             geckoWebBrowser1.HandleCreated += new EventHandler(geckoBrowser1_HandleCreated);

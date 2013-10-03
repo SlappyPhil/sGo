@@ -1,0 +1,15 @@
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Programming_For_Kinect_Book.exe.config
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.csprojResolveAssemblyReference.cache
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\MainWindow.baml
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\MainWindow.g.cs
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\App.g.cs
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book_MarkupCompile.cache
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.g.resources
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.Properties.Resources.resources
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.csproj.GenerateResource.Cache
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Programming_For_Kinect_Book.exe
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Programming_For_Kinect_Book.pdb
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Kinect.Toolbox.dll
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Kinect.Toolbox.pdb
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.exe
+c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.pdb

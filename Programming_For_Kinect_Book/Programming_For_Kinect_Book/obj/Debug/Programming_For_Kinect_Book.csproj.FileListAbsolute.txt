@@ -13,3 +13,6 @@ c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\
 c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Kinect.Toolbox.pdb
 c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.exe
 c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.pdb
+C:\Users\Jake\Documents\Visual Studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.dll
+C:\Users\Jake\Documents\Visual Studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.pdb
+C:\Users\Jake\Documents\Visual Studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.xml

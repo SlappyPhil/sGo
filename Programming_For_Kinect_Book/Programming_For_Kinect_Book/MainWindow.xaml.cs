@@ -14,6 +14,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
 using Kinect.Toolbox;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using WindowsInput;
+
 
 namespace Programming_For_Kinect_Book
 { 
@@ -24,6 +28,11 @@ namespace Programming_For_Kinect_Book
         SkeletonDisplayManager skeletonManager;
         GestureDetector gestureDetector = new SwipeGestureDetector();
         Skeleton[] skeletons;
+
+        public IntPtr MainWindowHandle { get; set; }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern long SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
         public MainWindow()
         {
@@ -169,9 +178,38 @@ namespace Programming_For_Kinect_Book
                             //Console.WriteLine("GESTURE DETECTED! Both hands above head");
                         }
 
-                        else if (jointDistance(skeleton.Joints[JointType.HandRight], skeleton.Joints[JointType.HandLeft]) < 0.1f)
+                        else if (skeleton.Joints[JointType.HipCenter].Position.Z - skeleton.Joints[JointType.HandLeft].Position.Z > 0.3f
+                                    && skeleton.Joints[JointType.HipCenter].Position.Z - skeleton.Joints[JointType.HandRight].Position.Z > 0.3f)
                         {
-                            //Console.WriteLine("Hands Touched! Right and left hand are touching");
+                            Console.WriteLine("Left and Right hand in front!!!");
+                        }
+
+                        else if (skeleton.Joints[JointType.AnkleLeft].Position.Z - skeleton.Joints[JointType.AnkleRight].Position.Z > 0.2f ||
+                                    skeleton.Joints[JointType.AnkleRight].Position.Z - skeleton.Joints[JointType.AnkleLeft].Position.Z > 0.2f)
+                        {
+                            Console.WriteLine("Stepped forward!");
+
+                            PressKeyA();
+
+                            //var key = Key.A;                    // Key to send
+                            //var target = Keyboard.FocusedElement;    // Target element
+                            //var routedEvent = Keyboard.KeyDownEvent; // Event to send
+
+                            //target.RaiseEvent(
+                            //  new KeyEventArgs(
+                            //    Keyboard.PrimaryDevice,
+                            //    Keyboard.PrimaryDevice.ActiveSource,
+                            //    0,
+                            //    key) { RoutedEvent = routedEvent }
+                            //);
+
+                            //var eventArgs = new TextCompositionEventArgs(Keyboard.PrimaryDevice,
+                            //                                            new TextComposition(InputManager.Current, Keyboard.FocusedElement, "A"));
+
+                            //eventArgs.RoutedEvent = TextInputEvent;
+                            //InputManager.Current.ProcessInput(eventArgs);
+
+                            
                         }
                         else
                         {
@@ -183,6 +221,12 @@ namespace Programming_For_Kinect_Book
                 skeletonManager.Draw(skeletons);
             }
         }
+
+        public void PressKeyA()
+        {
+            InputSimulator.SimulateKeyPress(VirtualKeyCode.VK_A);
+        }
+
 
         private float jointDistance(Joint first, Joint second)
         {

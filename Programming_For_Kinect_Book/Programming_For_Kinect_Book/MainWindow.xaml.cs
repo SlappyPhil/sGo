@@ -27,7 +27,13 @@ namespace Programming_For_Kinect_Book
         DepthStreamManager depthManager = new DepthStreamManager();
         SkeletonDisplayManager skeletonManager;
         GestureDetector gestureDetector = new SwipeGestureDetector();
+        ContextTracker contextTracker = new ContextTracker();
         Skeleton[] skeletons;
+        Skeleton primarySkeleton;
+
+        List<VirtualKeyCode> downKeyStrokes;
+
+        KinectSensor kinectSensor;
 
         public IntPtr MainWindowHandle { get; set; }
 
@@ -39,7 +45,6 @@ namespace Programming_For_Kinect_Book
             InitializeComponent();
         }
 
-        KinectSensor kinectSensor;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -69,6 +74,15 @@ namespace Programming_For_Kinect_Book
             kinectDisplay.DataContext = colorManager;
             //kinectDisplay.DataContext = depthManager;
 
+        }
+
+        private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (this.kinectSensor != null)
+            {
+                this.kinectSensor.Stop();
+                clearKeyStrokes();
+            }
         }
 
         void Kinects_StatusChanged(object sender, StatusChangedEventArgs e)
@@ -119,6 +133,8 @@ namespace Programming_For_Kinect_Book
             skeletonManager = new SkeletonDisplayManager(kinectSensor, skeletonCanvas);
             kinectSensor.SkeletonFrameReady += kinectSensor_SkeletonFrameReady;
 
+            downKeyStrokes = new List<VirtualKeyCode>();
+
             gestureDetector.DisplayCanvas = gestureCanvas;
 
             kinectSensor.Start();
@@ -164,61 +180,154 @@ namespace Programming_For_Kinect_Book
                 if (skeletons.All(s => s.TrackingState == SkeletonTrackingState.NotTracked))
                     return;
 
-                foreach (Skeleton skeleton in skeletons)
+                if (primarySkeleton == null)
                 {
-
-                    if (skeleton.TrackingId != 0)
-                    {
-
-                        gestureDetector.Add(skeleton.Joints[JointType.HandRight].Position, kinectSensor);
-                        //gestureDetector.Add(skeleton.Joints[JointType.HandLeft].Position, kinectSensor);
-
-                        if (skeleton.Joints[JointType.HandRight].Position.Y > skeleton.Joints[JointType.Head].Position.Y && skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.Head].Position.Y)
+                    foreach (Skeleton skeleton in skeletons)
+                    {   
+                        if (skeleton.TrackingId != 0)
                         {
-                            //Console.WriteLine("GESTURE DETECTED! Both hands above head");
-                        }
+                            contextTracker.Add(skeleton, JointType.HipCenter);
 
-                        else if (skeleton.Joints[JointType.HipCenter].Position.Z - skeleton.Joints[JointType.HandLeft].Position.Z > 0.3f
-                                    && skeleton.Joints[JointType.HipCenter].Position.Z - skeleton.Joints[JointType.HandRight].Position.Z > 0.3f)
-                        {
-                            Console.WriteLine("Left and Right hand in front!!!");
-                        }
-
-                        else if (skeleton.Joints[JointType.AnkleLeft].Position.Z - skeleton.Joints[JointType.AnkleRight].Position.Z > 0.2f ||
-                                    skeleton.Joints[JointType.AnkleRight].Position.Z - skeleton.Joints[JointType.AnkleLeft].Position.Z > 0.2f)
-                        {
-                            Console.WriteLine("Stepped forward!");
-
-                            PressKeyA();
-
-                            //var key = Key.A;                    // Key to send
-                            //var target = Keyboard.FocusedElement;    // Target element
-                            //var routedEvent = Keyboard.KeyDownEvent; // Event to send
-
-                            //target.RaiseEvent(
-                            //  new KeyEventArgs(
-                            //    Keyboard.PrimaryDevice,
-                            //    Keyboard.PrimaryDevice.ActiveSource,
-                            //    0,
-                            //    key) { RoutedEvent = routedEvent }
-                            //);
-
-                            //var eventArgs = new TextCompositionEventArgs(Keyboard.PrimaryDevice,
-                            //                                            new TextComposition(InputManager.Current, Keyboard.FocusedElement, "A"));
-
-                            //eventArgs.RoutedEvent = TextInputEvent;
-                            //InputManager.Current.ProcessInput(eventArgs);
-
-                            
-                        }
-                        else
-                        {
-                            //Console.WriteLine("Gesture not detected Right hand position: " + skeleton.TrackingId);
+                            if(skeletonIsReady(skeleton))
+                            {
+                                primarySkeleton = skeleton;
+                                Console.WriteLine("primary skeleton identified with id: " + primarySkeleton.TrackingId);
+                            }
                         }
                     }
                 }
+
+                else //if primarySkeleton is on screen
+                {
+                    //If the whole skeleton is in view, draw and detect gestures
+                    if (!HasClippedEdges(primarySkeleton)) 
+                    {
+                        skeletonManager.Draw(primarySkeleton);
+                        doGestureDetection();
+                    }
+
+                    else
+                    {
+                        //remove previous primary skeleton from array and sket primarySkeleton to null to find new primary
+                        for (int i = 0; i < skeletons.Length; i++)
+                            if (skeletons[i].TrackingId == primarySkeleton.TrackingId)
+                                skeletons[i] = null;
+
+                        primarySkeleton = null;
+                        clearKeyStrokes();
+                    }
+                }                 
+            }
+        }
+
+        //Returns true if skeleton is too close to edge and has a clipped skeleton
+        private Boolean HasClippedEdges(Skeleton skeleton)
+        {
+            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Bottom) || skeleton.ClippedEdges.HasFlag(FrameEdges.Top)
+                    || skeleton.ClippedEdges.HasFlag(FrameEdges.Left) || skeleton.ClippedEdges.HasFlag(FrameEdges.Right))
+                return true;
+            else
+                return false;
+        }
+
+        private Boolean skeletonIsReady(Skeleton skeleton)
+        {
+            if (contextTracker.IsStable(skeleton.TrackingId) && contextTracker.IsShouldersTowardsSensor(skeleton))
+                return true;
+            else
+                return false;
+
+        }
+
+        private void RenderClippedEdges(Skeleton skeleton)
+        {
+            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Bottom))
+            {
+                //DrawClippedEdges(FrameEdges.Bottom); // Make the border red to show the user is reaching the border
+                //Console.WriteLine("Too close to bottom!");
+            }
+
+            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Top))
+            {
+                //DrawClippedEdges(FrameEdges.Top);
+            }
+
+            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Left))
+            {
+                //DrawClippedEdges(FrameEdges.Left);
+            }
+
+            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Right))
+            {
+                //DrawClippedEdges(FrameEdges.Right);
+            }
+        }
+
+        public void doGestureDetection()
+        {
+            gestureDetector.Add(primarySkeleton.Joints[JointType.HandRight].Position, kinectSensor);
+
+            if (primarySkeleton.Joints[JointType.HandRight].Position.Y > primarySkeleton.Joints[JointType.Head].Position.Y
+                        && primarySkeleton.Joints[JointType.HandLeft].Position.Y > primarySkeleton.Joints[JointType.Head].Position.Y)
+            {
+                //Console.WriteLine("GESTURE DETECTED! Both hands above head");
+            }
+
+            else if (primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.HandLeft].Position.Z > 0.3f
+                        && primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.HandRight].Position.Z > 0.3f)
+            {
+                Console.WriteLine("Left and Right hand in front!!!");
+                PressKeyLeftArrow();
+            }
+
+            //Step forward with one foot
+            else if (primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - primarySkeleton.Joints[JointType.AnkleRight].Position.Z > 0.2f ||
+                        primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z > 0.2f)
+            {
+                Console.WriteLine("Stepped forward!");
+
+                PressKeyUpArrow();
+
+            }
+
+            //Turn shoulders left
+            else if (primarySkeleton.Joints[JointType.ShoulderLeft].Position.Z - primarySkeleton.Joints[JointType.ShoulderRight].Position.Z > 0.1f)
+            {
+                PressKeyLeftArrow();
+            }
+
+            //Turn shoulders right
+            else if (primarySkeleton.Joints[JointType.ShoulderRight].Position.Z - primarySkeleton.Joints[JointType.ShoulderLeft].Position.Z > 0.1f)
+            {
+                PressKeyRightArrow();
+            }
+               
+            //Look up
+            else if (primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.HipCenter].Position.Z > 0.05f)
+                        //&& primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.FootRight].Position.Z > 0.05f)
+            {
+                PressKeyCtrlUpArrow();
+            }
+            else if (primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z > 0.05f)
+                        //&& primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.FootRight].Position.Z > 0.05f)
+            {
+                PressKeyCtrlDownArrow();
+            }
                 
-                skeletonManager.Draw(skeletons);
+            else
+            {
+                clearKeyStrokes();
+            }
+
+        }
+
+        public void clearKeyStrokes() 
+        {
+            while(downKeyStrokes.Count > 0)
+            {
+                Console.WriteLine("Removed keystroke: " + downKeyStrokes[0]);
+                InputSimulator.SimulateKeyUp(downKeyStrokes[0]);
+                downKeyStrokes.Remove(downKeyStrokes[0]);
             }
         }
 
@@ -227,6 +336,62 @@ namespace Programming_For_Kinect_Book
             InputSimulator.SimulateKeyPress(VirtualKeyCode.VK_A);
         }
 
+        public void PressKeyUpArrow()
+        {
+            if(!InputSimulator.IsKeyDown(VirtualKeyCode.VK_W))
+            {
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.VK_W);
+                downKeyStrokes.Add(VirtualKeyCode.VK_W);
+            }
+        }
+
+        public void PressKeyLeftArrow()
+        {
+            if(!InputSimulator.IsKeyDown(VirtualKeyCode.LEFT))
+            {
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.LEFT);
+                downKeyStrokes.Add(VirtualKeyCode.LEFT);
+            }
+        }
+
+        public void PressKeyRightArrow()
+        {
+            if (!InputSimulator.IsKeyDown(VirtualKeyCode.RIGHT))
+            {
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.RIGHT);
+                downKeyStrokes.Add(VirtualKeyCode.RIGHT);
+            }
+        }
+
+        public void PressKeyCtrlUpArrow()
+        {
+            if (!InputSimulator.IsKeyDown(VirtualKeyCode.CONTROL))
+            {
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.CONTROL);
+                downKeyStrokes.Add(VirtualKeyCode.CONTROL);
+            }
+
+            if (!InputSimulator.IsKeyDown(VirtualKeyCode.UP))
+            {
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.UP);
+                downKeyStrokes.Add(VirtualKeyCode.UP);
+            }
+        }
+
+        public void PressKeyCtrlDownArrow()
+        {
+            if (!InputSimulator.IsKeyDown(VirtualKeyCode.CONTROL))
+            {
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.CONTROL);
+                downKeyStrokes.Add(VirtualKeyCode.CONTROL);
+            }
+
+            if (!InputSimulator.IsKeyDown(VirtualKeyCode.DOWN))
+            {
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.DOWN);
+                downKeyStrokes.Add(VirtualKeyCode.DOWN);
+            }
+        }
 
         private float jointDistance(Joint first, Joint second)
         {
@@ -238,3 +403,23 @@ namespace Programming_For_Kinect_Book
         }
     }
 }
+
+//Code we may need later for reference
+
+//var key = Key.A;                    // Key to send
+//var target = Keyboard.FocusedElement;    // Target element
+//var routedEvent = Keyboard.KeyDownEvent; // Event to send
+
+//target.RaiseEvent(
+//  new KeyEventArgs(
+//    Keyboard.PrimaryDevice,
+//    Keyboard.PrimaryDevice.ActiveSource,
+//    0,
+//    key) { RoutedEvent = routedEvent }
+//);
+
+//var eventArgs = new TextCompositionEventArgs(Keyboard.PrimaryDevice,
+//                                            new TextComposition(InputManager.Current, Keyboard.FocusedElement, "A"));
+
+//eventArgs.RoutedEvent = TextInputEvent;
+//InputManager.Current.ProcessInput(eventArgs);

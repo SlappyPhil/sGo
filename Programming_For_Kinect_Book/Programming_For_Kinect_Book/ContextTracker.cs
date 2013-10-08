@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.Kinect;
 using System;
+using Programming_For_Kinect_Book;
 
 namespace Programming_For_Kinect_Book
 {
@@ -119,5 +120,6 @@ namespace Programming_For_Kinect_Book
 
             return true;
         }
+
     }
 }

@@ -116,6 +116,27 @@ namespace Programming_For_Kinect_Book
             rootCanvas.Children.Add(line);
         }
 
+        //private void DrawBone(Joint jointFrom, Joint jointTo)
+        //{
+        //    if (jointFrom.TrackingState == JointTrackingState.NotTracked ||
+        //    jointTo.TrackingState == JointTrackingState.NotTracked)
+        //    {
+        //        return; // nothing to draw, one of the joints is not tracked
+        //    }
+
+        //    if (jointFrom.TrackingState == JointTrackingState.Inferred ||
+        //    jointTo.TrackingState == JointTrackingState.Inferred)
+        //    {
+        //        DrawNonTrackedBoneLine(jointFrom.Position, jointTo.Position);  // Draw thin lines if either one of the joints is inferred
+        //    }
+
+        //    if (jointFrom.TrackingState == JointTrackingState.Tracked &&
+        //    jointTo.TrackingState == JointTrackingState.Tracked)
+        //    {
+        //        DrawTrackedBoneLine(jointFrom.Position, jointTo.Position);  // Draw bold lines if the joints are both tracked
+        //    }
+        //}
+
         public void Draw(Skeleton[] skeletons)
         {
             rootCanvas.Children.Clear();
@@ -167,6 +188,61 @@ namespace Programming_For_Kinect_Book
                 Trace(JointType.AnkleRight, JointType.FootRight, skeleton.Joints);
                 Plot(JointType.FootRight, skeleton.Joints);
             }
+        }
+
+        public void Draw(Skeleton skeleton)
+        {
+            rootCanvas.Children.Clear();
+
+            if (skeleton.TrackingState != SkeletonTrackingState.Tracked)
+                return;
+            else
+            {
+                Plot(JointType.HandLeft, skeleton.Joints);
+                Trace(JointType.HandLeft, JointType.WristLeft, skeleton.Joints);
+                Plot(JointType.WristLeft, skeleton.Joints);
+                Trace(JointType.WristLeft, JointType.ElbowLeft, skeleton.Joints);
+                Plot(JointType.ElbowLeft, skeleton.Joints);
+                Trace(JointType.ElbowLeft, JointType.ShoulderLeft, skeleton.Joints);
+                Plot(JointType.ShoulderLeft, skeleton.Joints);
+                Trace(JointType.ShoulderLeft, JointType.ShoulderCenter, skeleton.Joints);
+
+                Plot(JointType.ShoulderCenter, skeleton.Joints);
+                Trace(JointType.ShoulderCenter, JointType.Head, skeleton.Joints);
+                Plot(JointType.Head, JointType.ShoulderCenter, skeleton.Joints);
+                Trace(JointType.ShoulderCenter, JointType.ShoulderRight, skeleton.Joints);
+
+                Plot(JointType.ShoulderRight, skeleton.Joints);
+                Trace(JointType.ShoulderRight, JointType.ElbowRight, skeleton.Joints);
+                Plot(JointType.ElbowRight, skeleton.Joints);
+                Trace(JointType.ElbowRight, JointType.WristRight, skeleton.Joints);
+                Plot(JointType.WristRight, skeleton.Joints);
+                Trace(JointType.WristRight, JointType.HandRight, skeleton.Joints);
+                Plot(JointType.HandRight, skeleton.Joints);
+
+                Trace(JointType.ShoulderCenter, JointType.Spine, skeleton.Joints);
+                Plot(JointType.Spine, skeleton.Joints);
+                Trace(JointType.Spine, JointType.HipCenter, skeleton.Joints);
+                Plot(JointType.HipCenter, skeleton.Joints);
+                Trace(JointType.HipCenter, JointType.HipLeft, skeleton.Joints);
+                Plot(JointType.HipLeft, skeleton.Joints);
+                Trace(JointType.HipLeft, JointType.KneeLeft, skeleton.Joints);
+                Plot(JointType.KneeLeft, skeleton.Joints);
+                Trace(JointType.KneeLeft, JointType.AnkleLeft, skeleton.Joints);
+                Plot(JointType.AnkleLeft, skeleton.Joints);
+                Trace(JointType.AnkleLeft, JointType.FootLeft, skeleton.Joints);
+                Plot(JointType.FootLeft, skeleton.Joints);
+
+                Trace(JointType.HipCenter, JointType.HipRight, skeleton.Joints);
+                Plot(JointType.HipRight, skeleton.Joints);
+                Trace(JointType.HipRight, JointType.KneeRight, skeleton.Joints);
+                Plot(JointType.KneeRight, skeleton.Joints);
+                Trace(JointType.KneeRight, JointType.AnkleRight, skeleton.Joints);
+                Plot(JointType.AnkleRight, skeleton.Joints);
+                Trace(JointType.AnkleRight, JointType.FootRight, skeleton.Joints);
+                Plot(JointType.FootRight, skeleton.Joints);
+            }
+            
         }
     }
 }

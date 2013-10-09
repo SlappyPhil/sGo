@@ -40,6 +40,9 @@
             this.geckoWebBrowser1.Name = "geckoWebBrowser1";
             this.geckoWebBrowser1.Size = new System.Drawing.Size(700, 502);
             this.geckoWebBrowser1.TabIndex = 0;
+            this.geckoWebBrowser1.Click += new System.EventHandler(this.geckoWebBrowser1_Click);
+            this.geckoWebBrowser1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.geckoWebBrowser1_KeyDown);
+            this.geckoWebBrowser1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.geckoWebBrowser1_MouseUp);
             // 
             // tb_Gestures
             // 
@@ -47,8 +50,10 @@
             this.tb_Gestures.Location = new System.Drawing.Point(0, 295);
             this.tb_Gestures.Multiline = true;
             this.tb_Gestures.Name = "tb_Gestures";
+            this.tb_Gestures.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.tb_Gestures.Size = new System.Drawing.Size(184, 207);
             this.tb_Gestures.TabIndex = 2;
+            this.tb_Gestures.Enter += new System.EventHandler(this.tb_Gestures_Enter);
             // 
             // lbl_Gestures
             // 

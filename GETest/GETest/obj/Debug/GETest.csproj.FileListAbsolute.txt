@@ -19,3 +19,13 @@ C:\Users\Jake\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.csprojResolveA
 C:\Users\Jake\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.MainForm.resources
 C:\Users\Jake\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.Properties.Resources.resources
 C:\Users\Jake\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.csproj.GenerateResource.Cache
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\bin\Debug\GETest.exe.config
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.exe
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.pdb
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.csprojResolveAssemblyReference.cache
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.MainForm.resources
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.Properties.Resources.resources
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\obj\Debug\GETest.csproj.GenerateResource.Cache
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\bin\Debug\GETest.exe
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\bin\Debug\GETest.pdb
+C:\Users\Daniel\Documents\GitHub\sGo\GETest\GETest\bin\Debug\Skybound.Gecko.xml

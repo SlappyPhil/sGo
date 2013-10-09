@@ -270,13 +270,13 @@ namespace Programming_For_Kinect_Book
             if (primarySkeleton.Joints[JointType.HandRight].Position.Y > primarySkeleton.Joints[JointType.Head].Position.Y
                         && primarySkeleton.Joints[JointType.HandLeft].Position.Y > primarySkeleton.Joints[JointType.Head].Position.Y)
             {
-                //Console.WriteLine("GESTURE DETECTED! Both hands above head");
+                
             }
 
             else if (primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.HandLeft].Position.Z > 0.3f
                         && primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.HandRight].Position.Z > 0.3f)
             {
-                Console.WriteLine("Left and Right hand in front!!!");
+                
                 PressKeyLeftArrow();
             }
 
@@ -284,7 +284,7 @@ namespace Programming_For_Kinect_Book
             else if (primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - primarySkeleton.Joints[JointType.AnkleRight].Position.Z > 0.2f ||
                         primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z > 0.2f)
             {
-                Console.WriteLine("Stepped forward!");
+                
 
                 PressKeyUpArrow();
 
@@ -340,6 +340,7 @@ namespace Programming_For_Kinect_Book
         {
             if(!InputSimulator.IsKeyDown(VirtualKeyCode.VK_W))
             {
+                tb_Gestures.Text += (Environment.NewLine + "Step forward.");
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.VK_W);
                 downKeyStrokes.Add(VirtualKeyCode.VK_W);
             }
@@ -349,6 +350,7 @@ namespace Programming_For_Kinect_Book
         {
             if(!InputSimulator.IsKeyDown(VirtualKeyCode.LEFT))
             {
+                tb_Gestures.Text += (Environment.NewLine + "Turn left.");
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.LEFT);
                 downKeyStrokes.Add(VirtualKeyCode.LEFT);
             }
@@ -358,6 +360,7 @@ namespace Programming_For_Kinect_Book
         {
             if (!InputSimulator.IsKeyDown(VirtualKeyCode.RIGHT))
             {
+                tb_Gestures.Text += (Environment.NewLine + "Turn right.");
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.RIGHT);
                 downKeyStrokes.Add(VirtualKeyCode.RIGHT);
             }
@@ -373,6 +376,7 @@ namespace Programming_For_Kinect_Book
 
             if (!InputSimulator.IsKeyDown(VirtualKeyCode.UP))
             {
+                tb_Gestures.Text += (Environment.NewLine + "Look up.");
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.UP);
                 downKeyStrokes.Add(VirtualKeyCode.UP);
             }
@@ -388,6 +392,7 @@ namespace Programming_For_Kinect_Book
 
             if (!InputSimulator.IsKeyDown(VirtualKeyCode.DOWN))
             {
+                tb_Gestures.Text += (Environment.NewLine + "Look down.");
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.DOWN);
                 downKeyStrokes.Add(VirtualKeyCode.DOWN);
             }

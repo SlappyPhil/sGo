@@ -16,3 +16,20 @@ c:\users\jake\documents\visual studio 2012\Projects\Programming_For_Kinect_Book\
 C:\Users\Jake\Documents\Visual Studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.dll
 C:\Users\Jake\Documents\Visual Studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.pdb
 C:\Users\Jake\Documents\Visual Studio 2012\Projects\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.xml
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Programming_For_Kinect_Book.exe.config
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.exe
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.pdb
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.csprojResolveAssemblyReference.cache
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\MainWindow.baml
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\MainWindow.g.cs
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\App.g.cs
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book_MarkupCompile.cache
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.g.resources
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.Properties.Resources.resources
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.csproj.GenerateResource.Cache
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Programming_For_Kinect_Book.exe
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Programming_For_Kinect_Book.pdb
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Kinect.Toolbox.dll
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Kinect.Toolbox.pdb
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.pdb
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.xml

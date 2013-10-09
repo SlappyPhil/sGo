@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Programming_For_Kinect_Book", "Programming_For_Kinect_Book\Programming_For_Kinect_Book.csproj", "{074348E9-661C-42E5-ABBB-CF6FE3174692}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinect.Toolbox", "..\..\..\..\Dropbox\UF\Semesters\13 Fall\NUI\Programming_With_the_Kinect_files\KinectToolbox\Kinect.Toolbox.csproj", "{2C84CE43-CDAB-4541-A55A-7F849E8AC247}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Kinect.Toolkit.Controls", "..\..\..\..\Dropbox\UF\Semesters\13 Fall\NUI\Project\Kinect Toolkit\Microsoft.Kinect.Toolkit.Controls\Microsoft.Kinect.Toolkit.Controls.csproj", "{4508C4D1-85BB-4F3F-9E3B-CC93D231C65D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinect.Toolbox", "..\KinectToolbox\Kinect.Toolbox.csproj", "{2C84CE43-CDAB-4541-A55A-7F849E8AC247}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +19,6 @@ Global
 		{2C84CE43-CDAB-4541-A55A-7F849E8AC247}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C84CE43-CDAB-4541-A55A-7F849E8AC247}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C84CE43-CDAB-4541-A55A-7F849E8AC247}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4508C4D1-85BB-4F3F-9E3B-CC93D231C65D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4508C4D1-85BB-4F3F-9E3B-CC93D231C65D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4508C4D1-85BB-4F3F-9E3B-CC93D231C65D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4508C4D1-85BB-4F3F-9E3B-CC93D231C65D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -111,7 +111,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Dropbox\UF\Semesters\13 Fall\NUI\Programming_With_the_Kinect_files\KinectToolbox\Kinect.Toolbox.csproj">
+    <ProjectReference Include="..\..\KinectToolbox\Kinect.Toolbox.csproj">
       <Project>{2c84ce43-cdab-4541-a55a-7f849e8ac247}</Project>
       <Name>Kinect.Toolbox</Name>
     </ProjectReference>

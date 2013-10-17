@@ -30,7 +30,7 @@ namespace Programming_For_Kinect_Book
             y = (float)(vector2.Y * rootCanvas.ActualHeight);
         }
 
-        void Plot(JointType centerID, IEnumerable<Joint> joints)
+        void Plot(JointType centerID, IEnumerable<Joint> joints, Color color)
         {
             float centerX;
             float centerY;
@@ -46,7 +46,7 @@ namespace Programming_For_Kinect_Book
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
                 StrokeThickness = 4.0,
-                Stroke = new SolidColorBrush(Colors.Green),
+                Stroke = new SolidColorBrush(color),
                 StrokeLineJoin = PenLineJoin.Round
             };
 
@@ -56,7 +56,7 @@ namespace Programming_For_Kinect_Book
             rootCanvas.Children.Add(ellipse);
         }
 
-        void Plot(JointType centerID, JointType baseID, JointCollection joints)
+        void Plot(JointType centerID, JointType baseID, JointCollection joints, Color color)
         {
             float centerX;
             float centerY;
@@ -77,7 +77,7 @@ namespace Programming_For_Kinect_Book
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
                 StrokeThickness = 4.0,
-                Stroke = new SolidColorBrush(Colors.Green),
+                Stroke = new SolidColorBrush(color),
                 StrokeLineJoin = PenLineJoin.Round
             };
 
@@ -87,7 +87,7 @@ namespace Programming_For_Kinect_Book
             rootCanvas.Children.Add(ellipse);
         }
 
-        void Trace(JointType sourceID, JointType destinationID, JointCollection joints)
+        void Trace(JointType sourceID, JointType destinationID, JointCollection joints, Color color)
         {
             float sourceX;
             float sourceY;
@@ -108,7 +108,7 @@ namespace Programming_For_Kinect_Book
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
                 StrokeThickness = 4.0,
-                Stroke = new SolidColorBrush(Colors.Green),
+                Stroke = new SolidColorBrush(color),
                 StrokeLineJoin = PenLineJoin.Round
             };
 
@@ -137,112 +137,84 @@ namespace Programming_For_Kinect_Book
         //    }
         //}
 
-        public void Draw(Skeleton[] skeletons)
+        private void Draw(Skeleton[] skeletons, Color color)
         {
             rootCanvas.Children.Clear();
             foreach (Skeleton skeleton in skeletons)
             {
                 if (skeleton.TrackingState != SkeletonTrackingState.Tracked)
                     continue;
-                Plot(JointType.HandLeft, skeleton.Joints);
-                Trace(JointType.HandLeft, JointType.WristLeft, skeleton.Joints);
-                Plot(JointType.WristLeft, skeleton.Joints);
-                Trace(JointType.WristLeft, JointType.ElbowLeft, skeleton.Joints);
-                Plot(JointType.ElbowLeft, skeleton.Joints);
-                Trace(JointType.ElbowLeft, JointType.ShoulderLeft, skeleton.Joints);
-                Plot(JointType.ShoulderLeft, skeleton.Joints);
-                Trace(JointType.ShoulderLeft, JointType.ShoulderCenter, skeleton.Joints);
-                
-                Plot(JointType.ShoulderCenter, skeleton.Joints);
-                Trace(JointType.ShoulderCenter, JointType.Head, skeleton.Joints);
-                Plot(JointType.Head, JointType.ShoulderCenter, skeleton.Joints);
-                Trace(JointType.ShoulderCenter, JointType.ShoulderRight, skeleton.Joints);
-                
-                Plot(JointType.ShoulderRight, skeleton.Joints);
-                Trace(JointType.ShoulderRight, JointType.ElbowRight, skeleton.Joints);
-                Plot(JointType.ElbowRight, skeleton.Joints);
-                Trace(JointType.ElbowRight, JointType.WristRight, skeleton.Joints);
-                Plot(JointType.WristRight, skeleton.Joints);
-                Trace(JointType.WristRight, JointType.HandRight, skeleton.Joints);
-                Plot(JointType.HandRight, skeleton.Joints);
-                
-                Trace(JointType.ShoulderCenter, JointType.Spine, skeleton.Joints);
-                Plot(JointType.Spine, skeleton.Joints);
-                Trace(JointType.Spine, JointType.HipCenter, skeleton.Joints);
-                Plot(JointType.HipCenter, skeleton.Joints);
-                Trace(JointType.HipCenter, JointType.HipLeft, skeleton.Joints);
-                Plot(JointType.HipLeft, skeleton.Joints);
-                Trace(JointType.HipLeft, JointType.KneeLeft, skeleton.Joints);
-                Plot(JointType.KneeLeft, skeleton.Joints);
-                Trace(JointType.KneeLeft, JointType.AnkleLeft, skeleton.Joints);
-                Plot(JointType.AnkleLeft, skeleton.Joints);
-                Trace(JointType.AnkleLeft, JointType.FootLeft, skeleton.Joints);
-                Plot(JointType.FootLeft, skeleton.Joints);
-                
-                Trace(JointType.HipCenter, JointType.HipRight, skeleton.Joints);
-                Plot(JointType.HipRight, skeleton.Joints);
-                Trace(JointType.HipRight, JointType.KneeRight, skeleton.Joints);
-                Plot(JointType.KneeRight, skeleton.Joints);
-                Trace(JointType.KneeRight, JointType.AnkleRight, skeleton.Joints);
-                Plot(JointType.AnkleRight, skeleton.Joints);
-                Trace(JointType.AnkleRight, JointType.FootRight, skeleton.Joints);
-                Plot(JointType.FootRight, skeleton.Joints);
+                Plot(JointType.HandLeft, skeleton.Joints, color);
+                Trace(JointType.HandLeft, JointType.WristLeft, skeleton.Joints, color);
+                Plot(JointType.WristLeft, skeleton.Joints, color);
+                Trace(JointType.WristLeft, JointType.ElbowLeft, skeleton.Joints, color);
+                Plot(JointType.ElbowLeft, skeleton.Joints, color);
+                Trace(JointType.ElbowLeft, JointType.ShoulderLeft, skeleton.Joints, color);
+                Plot(JointType.ShoulderLeft, skeleton.Joints, color);
+                Trace(JointType.ShoulderLeft, JointType.ShoulderCenter, skeleton.Joints, color);
+
+                Plot(JointType.ShoulderCenter, skeleton.Joints, color);
+                Trace(JointType.ShoulderCenter, JointType.Head, skeleton.Joints, color);
+                Plot(JointType.Head, JointType.ShoulderCenter, skeleton.Joints, color);
+                Trace(JointType.ShoulderCenter, JointType.ShoulderRight, skeleton.Joints, color);
+
+                Plot(JointType.ShoulderRight, skeleton.Joints, color);
+                Trace(JointType.ShoulderRight, JointType.ElbowRight, skeleton.Joints, color);
+                Plot(JointType.ElbowRight, skeleton.Joints, color);
+                Trace(JointType.ElbowRight, JointType.WristRight, skeleton.Joints, color);
+                Plot(JointType.WristRight, skeleton.Joints, color);
+                Trace(JointType.WristRight, JointType.HandRight, skeleton.Joints, color);
+                Plot(JointType.HandRight, skeleton.Joints, color);
+
+                Trace(JointType.ShoulderCenter, JointType.Spine, skeleton.Joints, color);
+                Plot(JointType.Spine, skeleton.Joints, color);
+                Trace(JointType.Spine, JointType.HipCenter, skeleton.Joints, color);
+                Plot(JointType.HipCenter, skeleton.Joints, color);
+                Trace(JointType.HipCenter, JointType.HipLeft, skeleton.Joints, color);
+                Plot(JointType.HipLeft, skeleton.Joints, color);
+                Trace(JointType.HipLeft, JointType.KneeLeft, skeleton.Joints, color);
+                Plot(JointType.KneeLeft, skeleton.Joints, color);
+                Trace(JointType.KneeLeft, JointType.AnkleLeft, skeleton.Joints, color);
+                Plot(JointType.AnkleLeft, skeleton.Joints, color);
+                Trace(JointType.AnkleLeft, JointType.FootLeft, skeleton.Joints, color);
+                Plot(JointType.FootLeft, skeleton.Joints, color);
+
+                Trace(JointType.HipCenter, JointType.HipRight, skeleton.Joints, color);
+                Plot(JointType.HipRight, skeleton.Joints, color);
+                Trace(JointType.HipRight, JointType.KneeRight, skeleton.Joints, color);
+                Plot(JointType.KneeRight, skeleton.Joints, color);
+                Trace(JointType.KneeRight, JointType.AnkleRight, skeleton.Joints, color);
+                Plot(JointType.AnkleRight, skeleton.Joints, color);
+                Trace(JointType.AnkleRight, JointType.FootRight, skeleton.Joints, color);
+                Plot(JointType.FootRight, skeleton.Joints, color);
             }
         }
 
-        public void Draw(Skeleton skeleton)
+        public void DrawStable(Skeleton skeleton)
+        {
+            Color color = Colors.Green;
+            Skeleton[] skeletons = new Skeleton[1];
+            skeletons[0] = skeleton;
+            this.Draw(skeletons, color);
+        }
+
+        public void DrawUnstable(Skeleton skeleton)
+        {
+            Color color = Colors.Red;
+            Skeleton[] skeletons = new Skeleton[1];
+            skeletons[0] = skeleton;
+            this.Draw(skeletons, color);
+        }
+
+        public void drawPositionOnly(Skeleton skeleton)
+        {
+            Color color = Colors.Blue;
+            Plot(JointType.Spine, skeleton.Joints, color);
+        }
+
+        public void EraseCanvas()
         {
             rootCanvas.Children.Clear();
-
-            if (skeleton.TrackingState != SkeletonTrackingState.Tracked)
-                return;
-            else
-            {
-                Plot(JointType.HandLeft, skeleton.Joints);
-                Trace(JointType.HandLeft, JointType.WristLeft, skeleton.Joints);
-                Plot(JointType.WristLeft, skeleton.Joints);
-                Trace(JointType.WristLeft, JointType.ElbowLeft, skeleton.Joints);
-                Plot(JointType.ElbowLeft, skeleton.Joints);
-                Trace(JointType.ElbowLeft, JointType.ShoulderLeft, skeleton.Joints);
-                Plot(JointType.ShoulderLeft, skeleton.Joints);
-                Trace(JointType.ShoulderLeft, JointType.ShoulderCenter, skeleton.Joints);
-
-                Plot(JointType.ShoulderCenter, skeleton.Joints);
-                Trace(JointType.ShoulderCenter, JointType.Head, skeleton.Joints);
-                Plot(JointType.Head, JointType.ShoulderCenter, skeleton.Joints);
-                Trace(JointType.ShoulderCenter, JointType.ShoulderRight, skeleton.Joints);
-
-                Plot(JointType.ShoulderRight, skeleton.Joints);
-                Trace(JointType.ShoulderRight, JointType.ElbowRight, skeleton.Joints);
-                Plot(JointType.ElbowRight, skeleton.Joints);
-                Trace(JointType.ElbowRight, JointType.WristRight, skeleton.Joints);
-                Plot(JointType.WristRight, skeleton.Joints);
-                Trace(JointType.WristRight, JointType.HandRight, skeleton.Joints);
-                Plot(JointType.HandRight, skeleton.Joints);
-
-                Trace(JointType.ShoulderCenter, JointType.Spine, skeleton.Joints);
-                Plot(JointType.Spine, skeleton.Joints);
-                Trace(JointType.Spine, JointType.HipCenter, skeleton.Joints);
-                Plot(JointType.HipCenter, skeleton.Joints);
-                Trace(JointType.HipCenter, JointType.HipLeft, skeleton.Joints);
-                Plot(JointType.HipLeft, skeleton.Joints);
-                Trace(JointType.HipLeft, JointType.KneeLeft, skeleton.Joints);
-                Plot(JointType.KneeLeft, skeleton.Joints);
-                Trace(JointType.KneeLeft, JointType.AnkleLeft, skeleton.Joints);
-                Plot(JointType.AnkleLeft, skeleton.Joints);
-                Trace(JointType.AnkleLeft, JointType.FootLeft, skeleton.Joints);
-                Plot(JointType.FootLeft, skeleton.Joints);
-
-                Trace(JointType.HipCenter, JointType.HipRight, skeleton.Joints);
-                Plot(JointType.HipRight, skeleton.Joints);
-                Trace(JointType.HipRight, JointType.KneeRight, skeleton.Joints);
-                Plot(JointType.KneeRight, skeleton.Joints);
-                Trace(JointType.KneeRight, JointType.AnkleRight, skeleton.Joints);
-                Plot(JointType.AnkleRight, skeleton.Joints);
-                Trace(JointType.AnkleRight, JointType.FootRight, skeleton.Joints);
-                Plot(JointType.FootRight, skeleton.Joints);
-            }
-            
         }
     }
 }

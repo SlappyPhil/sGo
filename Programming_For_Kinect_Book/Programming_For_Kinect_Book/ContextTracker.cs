@@ -121,5 +121,13 @@ namespace Programming_For_Kinect_Book
             return true;
         }
 
+        public bool IsNotClipped(Skeleton skeleton)
+        {
+            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Bottom) || skeleton.ClippedEdges.HasFlag(FrameEdges.Top)
+                    || skeleton.ClippedEdges.HasFlag(FrameEdges.Left) || skeleton.ClippedEdges.HasFlag(FrameEdges.Right))
+                return false;
+            else
+                return true;
+        }
     }
 }

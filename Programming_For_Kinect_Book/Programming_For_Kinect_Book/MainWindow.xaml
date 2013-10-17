@@ -4,16 +4,24 @@
         Title="sGo - Walking Simulator" Height="600" Width="800" Loaded="Window_Loaded">
     
         <Grid>
-            <Viewbox Margin="5" Grid.RowSpan="5" Grid.Row="0">
+            <Viewbox Margin="5" Grid.RowSpan="5" Grid.Row="0" VerticalAlignment="Top">
                 <Grid>
                     <Image x:Name="kinectDisplay" Source="{Binding Bitmap}"></Image>
                     <Canvas x:Name="skeletonCanvas"></Canvas>
                     <Canvas x:Name="gestureCanvas"></Canvas>
                 </Grid>
             </Viewbox>
-        <StackPanel VerticalAlignment="Bottom">
-            <Label x:Name="lbl_Gestures" Content="Gestures Recognized:" VerticalAlignment="Bottom" FontSize="18"></Label>
-            <TextBox x:Name="tb_Gestures" TextWrapping="Wrap" Text=" " AcceptsReturn="True" Height="150" Width="790" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-4,0" Grid.Row="1" FontSize="17" BorderThickness="10"/>
+            <StackPanel VerticalAlignment="Bottom">
+            <DockPanel>
+                <StackPanel>
+                <Label x:Name="lbl_Gestures" Content="Gestures Recognized:" VerticalAlignment="Bottom" FontSize="18" Margin="100,0,25,0"></Label>
+                <TextBox x:Name="tb_Gestures" TextWrapping="Wrap" Text=" " AcceptsReturn="True" Height="150" Width="250" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-4,0" Grid.Row="1" FontSize="17" BorderThickness="10" FontFamily="Rod"/>
+                </StackPanel>
+                <StackPanel>
+                    <Label x:Name="lbl_Debug" Content="Debug Log:" VerticalAlignment="Bottom" FontSize="18" Margin="125,0,25,0"></Label>
+                    <TextBox x:Name="tb_Debug" TextWrapping="Wrap" Text=" " AcceptsReturn="True" Height="150" Width="250" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-4,0" Grid.Row="1" FontSize="17" BorderThickness="10" FontFamily="Rod"/>
+                </StackPanel>
+            </DockPanel>
         </StackPanel>
         </Grid>
     

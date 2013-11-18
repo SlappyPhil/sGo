@@ -20,6 +20,13 @@ using WindowsInput;
 
 using Microsoft.Kinect.Toolkit.Interaction;
 
+//Make sure you have the speech SDK installed
+//go to add reference, browse, navigate to program files, micrsoft SDKs
+//speech, assemblies and select speech.dll
+using Microsoft.Speech.AudioFormat;
+using Microsoft.Speech.Recognition;
+using System.IO;
+
 namespace Programming_For_Kinect_Book
 {  
     public partial class MainWindow : Window
@@ -43,6 +50,9 @@ namespace Programming_For_Kinect_Book
         private Dictionary<int, InteractionHandEventType> _lastLeftHandEvents = new Dictionary<int, InteractionHandEventType>();
         private Dictionary<int, InteractionHandEventType> _lastRightHandEvents = new Dictionary<int, InteractionHandEventType>();
 
+        //the speech recognition engine (SRE)
+        private SpeechRecognitionEngine speechRecognizer;
+
         List<VirtualKeyCode> downKeyStrokes;
 
         KinectSensor kinectSensor;
@@ -51,6 +61,19 @@ namespace Programming_For_Kinect_Book
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern long SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+
+        //Get the speech recognizer (SR)
+        private static RecognizerInfo GetKinectRecognizer()
+        {
+            Func<RecognizerInfo, bool> matchingFunc = r =>
+            {
+                string value;
+                r.AdditionalInfo.TryGetValue("Kinect", out value);
+                return "True".Equals(value, StringComparison.InvariantCultureIgnoreCase) && "en-US".Equals(r.Culture.Name, StringComparison.InvariantCultureIgnoreCase);
+            };
+            return SpeechRecognitionEngine.InstalledRecognizers().Where(matchingFunc).FirstOrDefault();
+        }
 
         public MainWindow()
         {
@@ -154,7 +177,122 @@ namespace Programming_For_Kinect_Book
 
             //gestureDetector.DisplayCanvas = gestureCanvas;
 
+            speechRecognizer = CreateSpeechRecognizer();
+
             kinectSensor.Start();
+
+            Start();
+        }
+
+        //Start streaming audio
+        private void Start()
+        {
+            //set sensor audio source to variable
+            var audioSource = kinectSensor.AudioSource;
+            //Set the beam angle mode - the direction the audio beam is pointing
+            //we want it to be set to adaptive
+            audioSource.BeamAngleMode = BeamAngleMode.Adaptive;
+            //start the audiosource 
+            var kinectStream = audioSource.Start();
+            //configure incoming audio stream
+            speechRecognizer.SetInputToAudioStream(
+                kinectStream, new SpeechAudioFormatInfo(EncodingFormat.Pcm, 16000, 16, 1, 32000, 2, null));
+            //make sure the recognizer does not stop after completing     
+            speechRecognizer.RecognizeAsync(RecognizeMode.Multiple);
+            //reduce background and ambient noise for better accuracy
+            kinectSensor.AudioSource.EchoCancellationMode = EchoCancellationMode.None;
+            kinectSensor.AudioSource.AutomaticGainControlEnabled = false;
+        }
+
+        //here is the fun part: create the speech recognizer
+        private SpeechRecognitionEngine CreateSpeechRecognizer()
+        {
+            //set recognizer info
+            RecognizerInfo ri = GetKinectRecognizer();
+            //create instance of SRE
+            SpeechRecognitionEngine sre;
+            sre = new SpeechRecognitionEngine(ri.Id);
+
+            //Now we need to add the words we want our program to recognise
+            var grammar = new Choices();
+            grammar.Add("testing");
+            grammar.Add("Exit Street View");
+            grammar.Add("Go to Paris");
+            grammar.Add("Go to Gainesville");
+            grammar.Add("Reset");
+
+            //set culture - language, country/region
+            var gb = new GrammarBuilder { Culture = ri.Culture };
+            gb.Append(grammar);
+
+            //set up the grammar builder
+            var g = new Grammar(gb);
+            sre.LoadGrammar(g);
+
+            //Set events for recognizing, hypothesising and rejecting speech
+            sre.SpeechRecognized += SreSpeechRecognized;
+            sre.SpeechHypothesized += SreSpeechHypothesized;
+            sre.SpeechRecognitionRejected += SreSpeechRecognitionRejected;
+            return sre;
+        }
+
+        //if speech is rejected
+        private void RejectSpeech(RecognitionResult result)
+        {
+             Console.WriteLine("I didn't catch that...");
+        }
+
+        private void SreSpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
+        {
+            RejectSpeech(e.Result);
+        }
+
+        //hypothesized result
+        private void SreSpeechHypothesized(object sender, SpeechHypothesizedEventArgs e)
+        {
+            Console.WriteLine("Hypothesized: " + e.Result.Text + " " + e.Result.Confidence);
+        }
+
+        //Speech is recognised
+        private void SreSpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            //Very important! - change this value to adjust accuracy - the higher the value
+            //the more accurate it will have to be, lower it if it is not recognizing you
+            if (e.Result.Confidence < .8)
+            {
+                RejectSpeech(e.Result);
+            }
+            //and finally, here we set what we want to happen when 
+            //the SRE recognizes a word
+            else
+            {
+                switch (e.Result.Text.ToUpperInvariant())
+                {
+                    case "TESTING":
+                        Console.WriteLine("You said TESTING.");
+                        break;
+                    case "EXIT STREET VIEW":
+                        Console.WriteLine("You said EXIT STREET VIEW.");
+                        PressKeyEscape();
+                        break;
+                    case "GO TO PARIS":
+                        Console.WriteLine("You said GO TO PARIS.");
+                        GoToCityEvent("Paris");
+                        break;
+                    case "GO TO GAINESVILLE":
+                        Console.WriteLine("You said GO TO GAINESVILLE.");
+                        GoToCityEvent("Gainesville");
+                        break;
+
+                    case "RESET":
+                        Console.WriteLine("You said RESET");
+                        resetSkeleton();
+                        break;
+
+                    default:
+                        break;
+                }
+            }
         }
 
         private void Clean()
@@ -277,17 +415,23 @@ namespace Programming_For_Kinect_Book
             using (SkeletonFrame frame = e.OpenSkeletonFrame())
             {
                 if (frame == null)
+                {
+                    Console.WriteLine("Frame is null!");
                     return;
+                }
 
                 frame.GetSkeletons(ref skeletons);
+
                 if (skeletons.All(s => s.TrackingState == SkeletonTrackingState.NotTracked))
                 {
+                    Console.WriteLine("no skeleton tracked");
                     skeletonManager.EraseCanvas();
                     return;
                 }
 
-                if (primarySkeleton == null)
+                else if (primarySkeleton == null)
                 {
+                    Console.WriteLine("primary skeleton null");
                     primarySkeleton = getPrimarySkeleton(skeletons);
                 }
 
@@ -336,12 +480,10 @@ namespace Programming_For_Kinect_Book
                                 dump.AppendLine("User ID = " + skeletons[0].TrackingId);
                                 dump.AppendLine("    LeftHandEventType: " + leftHandGripped);
                                 dump.AppendLine("    rightHandEventType: " + rightHandGripped);
-                                Console.WriteLine("    rightHandEventType: " + rightHandGripped);
-                                Console.WriteLine("    LeftHandEventType: " + leftHandGripped);
 
                             }
 
-                            tb_Debug.Text = dump.ToString();
+                            //tb_Debug.Text = dump.ToString();
 
                         }
                         catch (InvalidOperationException)
@@ -375,6 +517,12 @@ namespace Programming_For_Kinect_Book
             }
         }
 
+        public void resetSkeleton()
+        {
+            primarySkeleton = null;
+            clearKeyStrokes();
+        }
+
         public Boolean primarySkeletonLost(Skeleton[] skeletons, Skeleton skeleton)
         {
             if(skeleton.TrackingId != 0)
@@ -385,6 +533,7 @@ namespace Programming_For_Kinect_Book
                 }
             return true;
         }
+
         public Skeleton getPrimarySkeleton(Skeleton[] skeletons)
         {
             Skeleton skeletonToReturn = null;
@@ -533,9 +682,24 @@ namespace Programming_For_Kinect_Book
             }
         }
 
+        public void GoToCityEvent(String city)
+        {
+            InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
+            InputSimulator.SimulateTextEntry(city);
+            InputSimulator.SimulateKeyPress(VirtualKeyCode.RETURN);
+            InputSimulator.SimulateKeyDown(VirtualKeyCode.SHIFT);
+            InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
+            InputSimulator.SimulateKeyUp(VirtualKeyCode.SHIFT);
+        }
+
         public void PressKeyA()
         {
             InputSimulator.SimulateKeyPress(VirtualKeyCode.VK_A);
+        }
+
+        public void PressKeyEscape()
+        {
+            InputSimulator.SimulateKeyPress(VirtualKeyCode.ESCAPE);
         }
 
         public void PressKeyUpArrow()

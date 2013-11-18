@@ -9,3 +9,14 @@ C:\Users\Jake\Dropbox\UF\Semesters\13 Fall\NUI\Programming_With_the_Kinect_files
 C:\Users\Jake\Dropbox\UF\Semesters\13 Fall\NUI\Programming_With_the_Kinect_files\KinectToolbox\obj\Debug\Kinect.Toolbox.g.resources
 C:\Users\Jake\Dropbox\UF\Semesters\13 Fall\NUI\Programming_With_the_Kinect_files\KinectToolbox\obj\Debug\Kinect.Toolbox.dll
 C:\Users\Jake\Dropbox\UF\Semesters\13 Fall\NUI\Programming_With_the_Kinect_files\KinectToolbox\obj\Debug\Kinect.Toolbox.pdb
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\bin\Debug\Kinect.Toolbox.dll
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\bin\Debug\Kinect.Toolbox.pdb
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Kinect.Toolbox.csprojResolveAssemblyReference.cache
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Controls\PresenceControl.baml
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Controls\MouseImpostor.baml
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Controls\PresenceControl.g.cs
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Controls\MouseImpostor.g.cs
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Kinect.Toolbox_MarkupCompile.cache
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Kinect.Toolbox.g.resources
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Kinect.Toolbox.dll
+C:\Users\Jake\Documents\GitHub\sGo\KinectToolbox\obj\Debug\Kinect.Toolbox.pdb

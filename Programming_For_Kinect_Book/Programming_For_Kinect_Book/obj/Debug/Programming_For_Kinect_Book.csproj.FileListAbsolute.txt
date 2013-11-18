@@ -51,3 +51,4 @@ C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_K
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.g.resources
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.Properties.Resources.resources
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.csproj.GenerateResource.Cache
+C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Microsoft.Kinect.Toolkit.Interaction.dll

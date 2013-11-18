@@ -17,8 +17,6 @@ using Kinect.Toolbox;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using WindowsInput;
-using VirtualInput;
-
 
 using Microsoft.Kinect.Toolkit.Interaction;
 
@@ -41,7 +39,6 @@ namespace Programming_For_Kinect_Book
         Skeleton[] skeletons;
         Skeleton primarySkeleton;
         //bool needsToBeStabalized = false; 
-<<<<<<< HEAD
 
         private InteractionStream _interactionStream;
 
@@ -56,9 +53,8 @@ namespace Programming_For_Kinect_Book
         //the speech recognition engine (SRE)
         private SpeechRecognitionEngine speechRecognizer;
 
-=======
+
         bool lastFrameUnstable = true;
->>>>>>> origin/daniel
         List<VirtualKeyCode> downKeyStrokes;
 
         KinectSensor kinectSensor;
@@ -431,7 +427,7 @@ namespace Programming_For_Kinect_Book
             }
 
             if (!hasUser)
-                tb_Debug.Text = "No user detected.";
+                tb_Gestures.Text = "No user detected.";
         }
 
         void kinectSensor_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
@@ -742,7 +738,6 @@ namespace Programming_For_Kinect_Book
             }
         }
 
-<<<<<<< HEAD
         public void GoToCityEvent(String city)
         {
             InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
@@ -751,7 +746,8 @@ namespace Programming_For_Kinect_Book
             InputSimulator.SimulateKeyDown(VirtualKeyCode.SHIFT);
             InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
             InputSimulator.SimulateKeyUp(VirtualKeyCode.SHIFT);
-=======
+        }
+
         public void clearSingleKey(VirtualKeyCode key)
         {
             if(InputSimulator.IsKeyDown(key))
@@ -761,7 +757,6 @@ namespace Programming_For_Kinect_Book
                 tb_Gestures.Text += Environment.NewLine + "Current: " + test + " Clearing: " + key.ToString();
             }
             
->>>>>>> origin/daniel
         }
 
         public void PressKeyA()
@@ -769,11 +764,12 @@ namespace Programming_For_Kinect_Book
             InputSimulator.SimulateKeyPress(VirtualKeyCode.VK_A);
         }
 
-<<<<<<< HEAD
+
         public void PressKeyEscape()
         {
             InputSimulator.SimulateKeyPress(VirtualKeyCode.ESCAPE);
-=======
+        }
+
         public void PressKeyEqual()
         {
             if (!InputSimulator.IsKeyDown(VirtualKeyCode.PRIOR))
@@ -783,7 +779,7 @@ namespace Programming_For_Kinect_Book
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.PRIOR);
                 downKeyStrokes.Add(VirtualKeyCode.PRIOR);
             }
->>>>>>> origin/daniel
+
         }
 
         public void PressKeyUpArrow()

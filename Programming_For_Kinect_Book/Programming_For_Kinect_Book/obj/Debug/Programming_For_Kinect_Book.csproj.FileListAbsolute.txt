@@ -38,7 +38,6 @@ C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_K
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.pdb
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Programming_For_Kinect_Book.exe
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Programming_For_Kinect_Book.pdb
-C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.dll
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Kinect.Toolbox.dll
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Kinect.Toolbox.pdb
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.pdb
@@ -60,3 +59,6 @@ C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For
 C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\StartWindow.g.cs
 C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book_Content.g.cs
 >>>>>>> origin/daniel
+C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\StartWindow.baml
+C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\StartWindow.g.cs
+C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book_Content.g.cs

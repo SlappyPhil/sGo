@@ -17,11 +17,11 @@ using Kinect.Toolbox;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using WindowsInput;
+
 using Microsoft.Kinect.Toolkit.Interaction;
 
-
 namespace Programming_For_Kinect_Book
-{ 
+{  
     public partial class MainWindow : Window
     {
         ColorStreamManager colorManager = new ColorStreamManager();
@@ -30,17 +30,27 @@ namespace Programming_For_Kinect_Book
         GestureDetector gestureDetector = new SwipeGestureDetector();
         ContextTracker contextTracker = new ContextTracker();
         Skeleton[] skeletons;
-        UserInfo[] userInfos;
         Skeleton primarySkeleton;
         //bool needsToBeStabalized = false; 
+
+        private InteractionStream _interactionStream;
+
+        private UserInfo[] _userInfos; //the information about the interactive users
+
+        Boolean leftHandGripped = false;
+        Boolean rightHandGripped = false;
+
+        private float mStartGripRightX;
+        private float mStartGripRightY;
+        private float mStartGripLeftX;
+        private float mStartGripLeftY;
+
+        private Dictionary<int, InteractionHandEventType> _lastLeftHandEvents = new Dictionary<int, InteractionHandEventType>();
+        private Dictionary<int, InteractionHandEventType> _lastRightHandEvents = new Dictionary<int, InteractionHandEventType>();
 
         List<VirtualKeyCode> downKeyStrokes;
 
         KinectSensor kinectSensor;
-        InteractionStream interactionStream;
-
-        private Boolean primaryLeftHandGrab = false;
-        private Boolean primaryRightHandGrab = false;
 
         public IntPtr MainWindowHandle { get; set; }
 
@@ -127,6 +137,10 @@ namespace Programming_For_Kinect_Book
 
         private void Initialize()
         {
+
+            mStartGripLeftX = -1;
+            mStartGripLeftY = -1;
+
             if (kinectSensor == null)
                 return;
 
@@ -136,15 +150,14 @@ namespace Programming_For_Kinect_Book
             kinectSensor.DepthStream.Enable();
             kinectSensor.DepthFrameReady += kinectSensor_DepthFrameReady;
 
-            
-            interactionStream = new InteractionStream(kinectSensor, new DummyInteractionClient());
-            Console.WriteLine("^^^^^^^ about to enter");
-            interactionStream.InteractionFrameReady += InteractionStreamOnInteractionFrameReady;
-            
+            _userInfos = new UserInfo[InteractionFrame.UserInfoArrayLength];
 
             kinectSensor.SkeletonStream.Enable();
             skeletonManager = new SkeletonDisplayManager(kinectSensor, skeletonCanvas);
             kinectSensor.SkeletonFrameReady += kinectSensor_SkeletonFrameReady;
+
+            _interactionStream = new InteractionStream(kinectSensor, new DummyInteractionClient());
+            _interactionStream.InteractionFrameReady += InteractionStreamOnInteractionFrameReady;
 
             downKeyStrokes = new List<VirtualKeyCode>();
 
@@ -172,24 +185,125 @@ namespace Programming_For_Kinect_Book
             }
         }
 
-        void kinectSensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
+        void kinectSensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs depthImageFrameReadyEventArgs)
         {
-            using (var frame = e.OpenDepthImageFrame())
+            using (DepthImageFrame depthFrame = depthImageFrameReadyEventArgs.OpenDepthImageFrame())
             {
-                if (frame == null)
+                if (depthFrame == null)
                     return;
 
-                depthManager.Update(frame);
+                try
+                {
+                    _interactionStream.ProcessDepth(depthFrame.GetRawPixelData(), depthFrame.Timestamp);
+                }
+                catch (InvalidOperationException)
+                {
+                    // DepthFrame functions may throw when the sensor gets
+                    // into a bad state.  Ignore the frame in that case.
+                }
             }
+        }
+
+        private void InteractionStreamOnInteractionFrameReady(object sender, InteractionFrameReadyEventArgs args)
+        {
+            using (var iaf = args.OpenInteractionFrame()) //dispose as soon as possible
+            {
+                if (iaf == null)
+                    return;
+
+                iaf.CopyInteractionDataTo(_userInfos);
+            }
+
+            StringBuilder dump = new StringBuilder();
+
+            var hasUser = false;
+            foreach (var userInfo in _userInfos)
+            {
+                var userID = userInfo.SkeletonTrackingId;
+                if (userID == 0)
+                    continue;
+
+                hasUser = true;
+                dump.AppendLine("User ID = " + userID);
+                dump.AppendLine("  Hands: ");
+                var hands = userInfo.HandPointers;
+                if (hands.Count == 0)
+                    dump.AppendLine("    No hands");
+                else
+                {
+                    foreach (var hand in hands)
+                    {
+                        var lastHandEvents = hand.HandType == InteractionHandType.Left
+                                                 ? _lastLeftHandEvents
+                                                 : _lastRightHandEvents;
+
+                        if (hand.HandEventType != InteractionHandEventType.None)
+                            lastHandEvents[userID] = hand.HandEventType;
+
+                        var lastHandEvent = lastHandEvents.ContainsKey(userID)
+                                                ? lastHandEvents[userID]
+                                                : InteractionHandEventType.None;
+
+                        if (hand.HandType == InteractionHandType.Left)
+                            if (lastHandEvent == InteractionHandEventType.Grip)
+                            {
+                                if (mStartGripLeftX == -1)
+                                {
+                                    mStartGripLeftX = primarySkeleton.Joints[JointType.HandLeft].Position.X;
+                                    mStartGripLeftY = primarySkeleton.Joints[JointType.HandLeft].Position.Y;
+                                    Console.WriteLine("startx: " + mStartGripLeftX + "  starty: " + mStartGripLeftY);
+                                }
+                                leftHandGripped = true;
+                            }
+                            else
+                            {
+                                mStartGripLeftX = -1;
+                                mStartGripLeftY = -1;
+                                leftHandGripped = false;
+                            }
+
+                        else if (hand.HandType == InteractionHandType.Right)
+                            if (lastHandEvent == InteractionHandEventType.Grip)
+                            {
+                                mStartGripRightX = primarySkeleton.Joints[JointType.HandRight].Position.X;
+                                mStartGripRightY = primarySkeleton.Joints[JointType.HandRight].Position.Y;
+                                rightHandGripped = true;
+                            }
+                            else
+                                rightHandGripped = false;
+
+                        //dump.AppendLine();
+                        //dump.AppendLine("    HandType: " + hand.HandType);
+                        //dump.AppendLine("    HandEventType: " + hand.HandEventType);
+                        dump.AppendLine("    LastHandEventType: " + lastHandEvent);
+                        //dump.AppendLine("    IsActive: " + hand.IsActive);
+                        //dump.AppendLine("    IsPrimaryForUser: " + hand.IsPrimaryForUser);
+                        //dump.AppendLine("    IsInteractive: " + hand.IsInteractive);
+                        //dump.AppendLine("    PressExtent: " + hand.PressExtent.ToString("N3"));
+                        //dump.AppendLine("    IsPressed: " + hand.IsPressed);
+                        //dump.AppendLine("    IsTracked: " + hand.IsTracked);
+                        //dump.AppendLine("    X: " + hand.X.ToString("N3"));
+                        //dump.AppendLine("    Y: " + hand.Y.ToString("N3"));
+                        //dump.AppendLine("    RawX: " + hand.RawX.ToString("N3"));
+                        //dump.AppendLine("    RawY: " + hand.RawY.ToString("N3"));
+                        //dump.AppendLine("    RawZ: " + hand.RawZ.ToString("N3"));
+                    }
+                }
+
+                //tb.Text = dump.ToString();
+            }
+
+            if (!hasUser)
+                tb_Debug.Text = "No user detected.";
         }
 
         void kinectSensor_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {       
-
             using (SkeletonFrame frame = e.OpenSkeletonFrame())
             {
                 if (frame == null)
                     return;
+
                 frame.GetSkeletons(ref skeletons);
                 if (skeletons.All(s => s.TrackingState == SkeletonTrackingState.NotTracked))
                 {
@@ -234,6 +348,33 @@ namespace Programming_For_Kinect_Book
                         skeletonManager.DrawStable(primarySkeleton);
                         doGestureDetection();
 
+                        try
+                        {
+                            frame.CopySkeletonDataTo(skeletons);
+                            var accelerometerReading = kinectSensor.AccelerometerGetCurrentReading();
+                            _interactionStream.ProcessSkeleton(skeletons, accelerometerReading, frame.Timestamp);
+
+                            StringBuilder dump = new StringBuilder();
+
+                            if (primarySkeleton.TrackingId != 0)
+                            {
+                                dump.AppendLine("User ID = " + skeletons[0].TrackingId);
+                                dump.AppendLine("    LeftHandEventType: " + leftHandGripped);
+                                dump.AppendLine("    rightHandEventType: " + rightHandGripped);
+                                //Console.WriteLine("    rightHandEventType: " + rightHandGripped);
+                                //Console.WriteLine("    LeftHandEventType: " + leftHandGripped);
+
+                            }
+
+                            tb_Debug.Text = dump.ToString();
+
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // SkeletonFrame functions may throw when the sensor gets
+                            // into a bad state.  Ignore the frame in that case.
+                        }
+
                         /*if (needsToBeStabalized)
                         {
                             if (skeletonIsReady(primarySkeleton))
@@ -257,8 +398,6 @@ namespace Programming_For_Kinect_Book
 	                }
                 }                 
             }
-
-            userInfos = new UserInfo[InteractionFrame.UserInfoArrayLength];
         }
 
         public Boolean primarySkeletonLost(Skeleton[] skeletons, Skeleton skeleton)
@@ -396,12 +535,31 @@ namespace Programming_For_Kinect_Book
             {
                 PressKeyCtrlDownArrow();
             }
-                
             else
             {
                 clearKeyStrokes();
             }
 
+            if (leftHandGripped || rightHandGripped)
+            {
+                // for one handed grip gestures (pan)
+
+                float leftHandX = mStartGripLeftX;
+                float leftHandY = mStartGripLeftY;
+
+                mStartGripLeftX = primarySkeleton.Joints[JointType.HandLeft].Position.X;
+                mStartGripLeftY = primarySkeleton.Joints[JointType.HandLeft].Position.Y;
+                float rightHandX = primarySkeleton.Joints[JointType.HandRight].Position.X;
+                float rightHandY = primarySkeleton.Joints[JointType.HandRight].Position.Y;
+
+                int dx = (int) ((leftHandX - mStartGripLeftX) * 1000);
+                int dy = (int) ((leftHandY - mStartGripLeftY) * 1000);
+
+                //Console.WriteLine("x: " + leftHandX + "  y: " + leftHandY);
+                Console.WriteLine("dx: " + dx + "  dy: " + dy);
+
+                MouseInterop.ControlMouse(-dx, dy, true);
+            }
         }
 
         public void clearKeyStrokes() 
@@ -499,153 +657,7 @@ namespace Programming_For_Kinect_Book
 
             return (float)Math.Sqrt((dX * dX) + (dY * dY) + (dZ * dZ));
         }
-
-        private Dictionary<int, InteractionHandEventType> _lastLeftHandEvents = new Dictionary<int, InteractionHandEventType>();
-        private Dictionary<int, InteractionHandEventType> _lastRightHandEvents = new Dictionary<int, InteractionHandEventType>();
-
-        private void InteractionStreamOnInteractionFrameReady(object sender, InteractionFrameReadyEventArgs args)
-        {
-
-            Console.WriteLine("inside interactionstreamoninteractionframeready");
-
-            tb_Debug.Text += Environment.NewLine + "interactionstreamoninteractionframeready";
-            using (var iaf = args.OpenInteractionFrame()) //dispose as soon as possible
-            {
-                if (iaf == null)
-                    return;
-
-                iaf.CopyInteractionDataTo(userInfos);
-            }
-
-            var hasUser = false;
-            foreach (var userInfo in userInfos)
-            {
-                var userID = userInfo.SkeletonTrackingId;
-
-                // We only want the hands of the primary skeleton
-                if (userID != primarySkeleton.TrackingId)
-                {
-                    continue;
-                }
-
-                hasUser = true;
-                var hands = userInfo.HandPointers;
-                if (hands.Count == 0)
-                {
-                    // We have no hands!!!
-                }
-                else
-                {
-                    foreach (var hand in hands)
-                    {
-                        var lastHandEvents = hand.HandType == InteractionHandType.Left
-                                                    ? _lastLeftHandEvents
-                                                    : _lastRightHandEvents;
-
-                        if (hand.HandEventType != InteractionHandEventType.None)
-                            lastHandEvents[userID] = hand.HandEventType;
-
-                        var lastHandEvent = lastHandEvents.ContainsKey(userID)
-                                                ? lastHandEvents[userID]
-                                                : InteractionHandEventType.None;
-
-                        if (lastHandEvent == 0)
-                        {
-                            if (hand.HandType == InteractionHandType.Left)
-                            {
-                                primaryLeftHandGrab = lastHandEvent == 0;
-                                if(primaryLeftHandGrab)
-                                    tb_Debug.Text += Environment.NewLine + "Left hand grabbed!";
-                                else
-                                    tb_Debug.Text += Environment.NewLine + "Left hand released!";
-                            }
-                            else
-                            {
-                                primaryRightHandGrab = lastHandEvent == 0;
-                                if(primaryRightHandGrab)
-                                    tb_Debug.Text += Environment.NewLine + "Right hand grabbed!";
-                                else
-                                    tb_Debug.Text += Environment.NewLine + "Right hand released!";
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!hasUser)
-            {
-                // we have not detected a user :(
-            }
-        }
-
     }
-
-    /*
-    private void InteractionStreamOnInteractionFrameReady(object sender, InteractionFrameReadyEventArgs args)
-    {
-        using (var iaf = args.OpenInteractionFrame()) //dispose as soon as possible
-        {
-            if (iaf == null)
-                return;
-
-            iaf.CopyInteractionDataTo(_userInfos);
-        }
-
-        StringBuilder dump = new StringBuilder();
-
-        var hasUser = false;
-        foreach (var userInfo in _userInfos)
-        {
-            var userID = userInfo.SkeletonTrackingId;
-            if (userID == 0)
-                continue;
-
-            hasUser = true;
-            dump.AppendLine("User ID = " + userID);
-            dump.AppendLine("  Hands: ");
-            var hands = userInfo.HandPointers;
-            if (hands.Count == 0)
-                dump.AppendLine("    No hands");
-            else
-            {
-                foreach (var hand in hands)
-                {
-                    var lastHandEvents = hand.HandType == InteractionHandType.Left
-                                                ? _lastLeftHandEvents
-                                                : _lastRightHandEvents;
-
-                    if (hand.HandEventType != InteractionHandEventType.None)
-                        lastHandEvents[userID] = hand.HandEventType;
-
-                    var lastHandEvent = lastHandEvents.ContainsKey(userID)
-                                            ? lastHandEvents[userID]
-                                            : InteractionHandEventType.None;
-
-                    dump.AppendLine();
-                    dump.AppendLine("    HandType: " + hand.HandType);
-                    dump.AppendLine("    HandEventType: " + hand.HandEventType);
-                    dump.AppendLine("    LastHandEventType: " + lastHandEvent);
-                    dump.AppendLine("    IsActive: " + hand.IsActive);
-                    dump.AppendLine("    IsPrimaryForUser: " + hand.IsPrimaryForUser);
-                    dump.AppendLine("    IsInteractive: " + hand.IsInteractive);
-                    dump.AppendLine("    PressExtent: " + hand.PressExtent.ToString("N3"));
-                    dump.AppendLine("    IsPressed: " + hand.IsPressed);
-                    dump.AppendLine("    IsTracked: " + hand.IsTracked);
-                    dump.AppendLine("    X: " + hand.X.ToString("N3"));
-                    dump.AppendLine("    Y: " + hand.Y.ToString("N3"));
-                    dump.AppendLine("    RawX: " + hand.RawX.ToString("N3"));
-                    dump.AppendLine("    RawY: " + hand.RawY.ToString("N3"));
-                    dump.AppendLine("    RawZ: " + hand.RawZ.ToString("N3"));
-                }
-            }
-
-            tb.Text = dump.ToString();
-        }
-
-        if (!hasUser)
-            tb.Text = "No user detected.";
-    }
-     */
 }
 
 //Code we may need later for reference

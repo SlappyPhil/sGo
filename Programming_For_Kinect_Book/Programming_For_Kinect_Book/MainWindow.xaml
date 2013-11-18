@@ -1,9 +1,11 @@
 ﻿<Window x:Class="Programming_For_Kinect_Book.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="sGo - Walking Simulator" Height="600" Width="800" Loaded="Window_Loaded">
+        Title="sGo - Walking Simulator" Width="510" Loaded="Window_Loaded" Height="768">
     
         <Grid>
+        <MediaElement Name="me_SkeletonReady" Source="Ding.wav"></MediaElement>
+        <MediaElement Name="me_SkeletonOut"></MediaElement>
             <Viewbox Margin="5" Grid.RowSpan="5" Grid.Row="0" VerticalAlignment="Top">
                 <Grid>
                     <Image x:Name="kinectDisplay" Source="{Binding Bitmap}"></Image>
@@ -14,12 +16,8 @@
             <StackPanel VerticalAlignment="Bottom">
             <DockPanel>
                 <StackPanel>
-                <Label x:Name="lbl_Gestures" Content="Gestures Recognized:" VerticalAlignment="Bottom" FontSize="18" Margin="100,0,25,0"></Label>
-                <TextBox x:Name="tb_Gestures" TextWrapping="Wrap" Text=" " AcceptsReturn="True" Height="150" Width="250" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-4,0" Grid.Row="1" FontSize="17" BorderThickness="10" FontFamily="Rod"/>
-                </StackPanel>
-                <StackPanel>
-                    <Label x:Name="lbl_Debug" Content="Debug Log:" VerticalAlignment="Bottom" FontSize="18" Margin="125,0,25,0"></Label>
-                    <TextBox x:Name="tb_Debug" TextWrapping="Wrap" Text=" " AcceptsReturn="True" Height="150" Width="250" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-4,0" Grid.Row="1" FontSize="17" BorderThickness="10" FontFamily="Rod"/>
+                <Label x:Name="lbl_Gestures" Content="Traveler's Log:" VerticalAlignment="Bottom" FontSize="18" Margin="0" FontWeight="Bold"></Label>
+                <TextBox x:Name="tb_Gestures" TextWrapping="Wrap" Text=" " AcceptsReturn="True" Height="350" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="-4,0" Grid.Row="1" FontSize="17" BorderThickness="10" FontFamily="Rod" Width="510"/>
                 </StackPanel>
             </DockPanel>
         </StackPanel>

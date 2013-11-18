@@ -70,3 +70,4 @@ C:\Users\matthew\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_Fo
 C:\Users\matthew\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.g.resources
 C:\Users\matthew\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.Properties.Resources.resources
 C:\Users\matthew\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.csproj.GenerateResource.Cache
+C:\Users\matthew\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\Microsoft.Kinect.Toolkit.Interaction.dll

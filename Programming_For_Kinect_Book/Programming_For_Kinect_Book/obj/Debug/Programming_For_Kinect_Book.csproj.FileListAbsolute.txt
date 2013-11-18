@@ -51,3 +51,8 @@ C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_K
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.g.resources
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.Properties.Resources.resources
 C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book.csproj.GenerateResource.Cache
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\InputSimulator.dll
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\bin\Debug\VirtualInput.dll
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\StartWindow.baml
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\StartWindow.g.cs
+C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\obj\Debug\Programming_For_Kinect_Book_Content.g.cs

@@ -1,0 +1,12 @@
+﻿<Window x:Class="Programming_For_Kinect_Book.StartWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="sGo" Width="600" Height="400" WindowStartupLocation="CenterScreen">
+    <Grid Name="grid">
+        <Label Content="sGo" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Top" FontSize="150" FontWeight="Bold"/>
+        <Button x:Name="btn_Explore" Content="Let's Explore!" HorizontalAlignment="Center" Margin="0,0,0,75" VerticalAlignment="Bottom" Width="150" Height="49" FontSize="25" Click="btn_Explore_Click"/>
+        <TextBox Name="tb_UserName" HorizontalAlignment="Left" Height="23" Margin="221,215,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Label Content="My name is..." HorizontalAlignment="Left" Margin="143,212,0,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

@@ -17,6 +17,8 @@ using Kinect.Toolbox;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using WindowsInput;
+using VirtualInput;
+
 
 
 namespace Programming_For_Kinect_Book
@@ -31,10 +33,16 @@ namespace Programming_For_Kinect_Book
         Skeleton[] skeletons;
         Skeleton primarySkeleton;
         //bool needsToBeStabalized = false; 
-
+        bool lastFrameUnstable = true;
         List<VirtualKeyCode> downKeyStrokes;
 
         KinectSensor kinectSensor;
+        public String userName = "The user ";
+        String test = "";
+        MediaElement sound_Detected = new MediaElement();
+        MediaElement sound_NotDetected = new MediaElement();
+
+        public float stableRightFootPosition, stableLeftFootPosition;
 
         public IntPtr MainWindowHandle { get; set; }
 
@@ -48,6 +56,18 @@ namespace Programming_For_Kinect_Book
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            var desktopWorkingArea = System.Windows.SystemParameters.WorkArea;
+            this.Left = desktopWorkingArea.Left;
+            this.Top = desktopWorkingArea.Top;
+
+            me_SkeletonReady.LoadedBehavior = MediaState.Manual;
+            me_SkeletonReady.UnloadedBehavior = MediaState.Manual;
+            me_SkeletonReady.Source = new Uri(@"C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Ding.wav", UriKind.Absolute);
+
+            me_SkeletonOut.LoadedBehavior = MediaState.Manual;
+            me_SkeletonOut.UnloadedBehavior = MediaState.Manual;
+            me_SkeletonOut.Source = new Uri(@"C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Fail.wav", UriKind.Absolute);
+
             try
             {
                 //listen to any status change for Kinects
@@ -195,8 +215,9 @@ namespace Programming_For_Kinect_Book
                     if(primarySkeletonLost(skeletons, primarySkeleton))
                     {
                         //remove previous primary skeleton from array and sket primarySkeleton to null to find new primary
-                        tb_Debug.Text += Environment.NewLine + "Primary skeleton lost";
-                        tb_Debug.ScrollToEnd();
+                        //tb_Gestures.Text += Environment.NewLine + "Primary skeleton lost";
+                        
+                        tb_Gestures.ScrollToEnd();
                         Console.WriteLine("primary skeleton removed with id: " + primarySkeleton.TrackingId);
 
                         primarySkeleton = null;
@@ -208,10 +229,16 @@ namespace Programming_For_Kinect_Book
 
                     else if (HasClippedEdges(primarySkeleton)) 
                     {
+                        if (!lastFrameUnstable)
+                        {
+                            tb_Gestures.Text += Environment.NewLine + userName + "is lost!";
+                            me_SkeletonOut.Play();
+                        }
                         skeletonManager.DrawUnstable(primarySkeleton);
                         clearKeyStrokes();
-                        //tb_Debug.Text += Environment.NewLine + "Primary skeleton partially out of view";
-                        //tb_Debug.ScrollToEnd();
+                        lastFrameUnstable = true;
+                        //tb_Gestures.Text += Environment.NewLine + "Primary skeleton partially out of view";
+                        //tb_Gestures.ScrollToEnd();
 
                         //needsToBeStabalized = true;
                         //Console.WriteLine("Skeleton needs to be stabalized");
@@ -219,8 +246,14 @@ namespace Programming_For_Kinect_Book
 
                     else
 	                {
+                        if (lastFrameUnstable)
+                        {
+                            tb_Gestures.Text += Environment.NewLine + userName + "is ready to explore!";
+                            me_SkeletonReady.Play();
+                        }
                         skeletonManager.DrawStable(primarySkeleton);
                         doGestureDetection();
+                        lastFrameUnstable = false;
 
                         /*if (needsToBeStabalized)
                         {
@@ -268,14 +301,18 @@ namespace Programming_For_Kinect_Book
                     //contextTracker.Add(skeleton, JointType.HipCenter);
                     contextTracker.Add(skeleton.Position.ToVector3(), skeleton.TrackingId);
 
-                    //tb_Debug.Text += Environment.NewLine + "Skeleton found - id: " + skeleton.TrackingId;
-                    //tb_Debug.ScrollToEnd();
+                    //tb_Gestures.Text += Environment.NewLine + "Skeleton found - id: " + skeleton.TrackingId;
+                    //tb_Gestures.ScrollToEnd();
 
                     if (skeletonIsReady(skeleton))
                     {
                         skeletonToReturn = skeleton;
-                        tb_Debug.Text += Environment.NewLine + "Primary skeleton ready - id: " + skeletonToReturn.TrackingId;
-                        tb_Debug.ScrollToEnd();
+                        //tb_Gestures.Text += Environment.NewLine + "Primary skeleton ready - id: " + skeletonToReturn.TrackingId;
+                        
+                        
+
+                        
+                        tb_Gestures.ScrollToEnd();
                         Console.WriteLine("primary skeleton identified with id: " + skeletonToReturn.TrackingId);
                     }
                     else
@@ -349,14 +386,28 @@ namespace Programming_For_Kinect_Book
             //    PressKeyLeftArrow();
             //}
 
+            ////Step backward with one foot
+            //if (primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - stableLeftFootPosition> 0.2f ||
+            //            primarySkeleton.Joints[JointType.AnkleRight].Position.Z - stableRightFootPosition > 0.2f)
+            //{
+            //    PressKeyDownArrow();
+            //}
+
             //Step forward with one foot
-            if (primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - primarySkeleton.Joints[JointType.AnkleRight].Position.Z > 0.2f ||
-                        primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z > 0.2f)
+            if (primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - primarySkeleton.Joints[JointType.AnkleRight].Position.Z > 0.4f ||
+                        primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z > 0.4f)
             {
-                
+                test = "Fast walk";
+                clearSingleKey(VirtualKeyCode.VK_W); //THESE NEED TO BE HERE BUT ARENT WORKNG RIGHT
+                PressKeyEqual();
 
+            }
+            else if ((primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - primarySkeleton.Joints[JointType.AnkleRight].Position.Z > 0.2f && primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - primarySkeleton.Joints[JointType.AnkleRight].Position.Z < 0.4f) ||
+                    (primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z > 0.2f && primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z < 0.4f))
+            {
+                test = "Slow walk";
+                clearSingleKey(VirtualKeyCode.PRIOR); //THESE NEED TO BE HERE BUT ARENT WORKNG RIGHT
                 PressKeyUpArrow();
-
             }
 
             //Turn shoulders left
@@ -369,6 +420,7 @@ namespace Programming_For_Kinect_Book
             else if (primarySkeleton.Joints[JointType.ShoulderRight].Position.Z - primarySkeleton.Joints[JointType.ShoulderLeft].Position.Z > 0.1f)
             {
                 PressKeyRightArrow();
+                
             }
                
             //Look up
@@ -376,15 +428,18 @@ namespace Programming_For_Kinect_Book
                         //&& primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.FootRight].Position.Z > 0.05f)
             {
                 PressKeyCtrlUpArrow();
+                
             }
             else if (primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z > 0.05f)
                         //&& primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.FootRight].Position.Z > 0.05f)
             {
                 PressKeyCtrlDownArrow();
             }
-                
+
             else
             {
+             
+
                 clearKeyStrokes();
             }
 
@@ -394,9 +449,10 @@ namespace Programming_For_Kinect_Book
         {
             //if (downKeyStrokes.Count > 0)
             //{
-            //    tb_Debug.Text += Environment.NewLine + "Key strokes cleared";
-            //    tb_Debug.ScrollToEnd();
+            //    tb_Gestures.Text += Environment.NewLine + "Key strokes cleared";
+            //    tb_Gestures.ScrollToEnd();
             //}
+         
             while(downKeyStrokes.Count > 0)
             {
                 //Console.WriteLine("Removed keystroke: " + downKeyStrokes[0]);
@@ -405,19 +461,52 @@ namespace Programming_For_Kinect_Book
             }
         }
 
+        public void clearSingleKey(VirtualKeyCode key)
+        {
+            if(InputSimulator.IsKeyDown(key))
+            {
+                InputSimulator.SimulateKeyUp(key);
+                downKeyStrokes.Remove(key);
+                tb_Gestures.Text += Environment.NewLine + "Current: " + test + " Clearing: " + key.ToString();
+            }
+            
+        }
+
         public void PressKeyA()
         {
             InputSimulator.SimulateKeyPress(VirtualKeyCode.VK_A);
+        }
+
+        public void PressKeyEqual()
+        {
+            if (!InputSimulator.IsKeyDown(VirtualKeyCode.PRIOR))
+            {
+                tb_Gestures.Text += (Environment.NewLine + "Step forward fast.");
+                tb_Gestures.ScrollToEnd();
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.PRIOR);
+                downKeyStrokes.Add(VirtualKeyCode.PRIOR);
+            }
         }
 
         public void PressKeyUpArrow()
         {
             if(!InputSimulator.IsKeyDown(VirtualKeyCode.VK_W))
             {
-                tb_Gestures.Text += (Environment.NewLine + "Step forward.");
+                tb_Gestures.Text += (Environment.NewLine + "Step forward normal.");
                 tb_Gestures.ScrollToEnd();
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.VK_W);
                 downKeyStrokes.Add(VirtualKeyCode.VK_W);
+            }
+        }
+
+        public void PressKeyDownArrow()
+        {
+            if (!InputSimulator.IsKeyDown(VirtualKeyCode.VK_S))
+            {
+                tb_Gestures.Text += (Environment.NewLine + "Step backward.");
+                tb_Gestures.ScrollToEnd();
+                InputSimulator.SimulateKeyDown(VirtualKeyCode.VK_S);
+                downKeyStrokes.Add(VirtualKeyCode.VK_S);
             }
         }
 

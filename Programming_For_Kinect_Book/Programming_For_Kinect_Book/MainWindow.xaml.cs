@@ -34,11 +34,10 @@ namespace Programming_For_Kinect_Book
         ColorStreamManager colorManager = new ColorStreamManager();
         DepthStreamManager depthManager = new DepthStreamManager();
         SkeletonDisplayManager skeletonManager;
-        GestureDetector gestureDetector = new SwipeGestureDetector();
+        //GestureDetector gestureDetector = new SwipeGestureDetector();
         ContextTracker contextTracker = new ContextTracker();
         Skeleton[] skeletons;
         Skeleton primarySkeleton;
-        //bool needsToBeStabalized = false; 
 
         private InteractionStream _interactionStream;
 
@@ -52,7 +51,6 @@ namespace Programming_For_Kinect_Book
 
         //the speech recognition engine (SRE)
         private SpeechRecognitionEngine speechRecognizer;
-
 
         bool lastFrameUnstable = true;
         List<VirtualKeyCode> downKeyStrokes;
@@ -70,18 +68,7 @@ namespace Programming_For_Kinect_Book
         [DllImport("user32.dll", SetLastError = true)]
         private static extern long SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
-
-        //Get the speech recognizer (SR)
-        private static RecognizerInfo GetKinectRecognizer()
-        {
-            Func<RecognizerInfo, bool> matchingFunc = r =>
-            {
-                string value;
-                r.AdditionalInfo.TryGetValue("Kinect", out value);
-                return "True".Equals(value, StringComparison.InvariantCultureIgnoreCase) && "en-US".Equals(r.Culture.Name, StringComparison.InvariantCultureIgnoreCase);
-            };
-            return SpeechRecognitionEngine.InstalledRecognizers().Where(matchingFunc).FirstOrDefault();
-        }
+        bool doingGesture = false;
 
         public MainWindow()
         {
@@ -96,11 +83,16 @@ namespace Programming_For_Kinect_Book
 
             me_SkeletonReady.LoadedBehavior = MediaState.Manual;
             me_SkeletonReady.UnloadedBehavior = MediaState.Manual;
-            me_SkeletonReady.Source = new Uri(@"C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Ding.wav", UriKind.Absolute);
+            me_SkeletonReady.Source = new Uri(@"C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Ding.wav", UriKind.Absolute);
+            //me_SkeletonReady.Source = new Uri(@"C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Ding.wav", UriKind.Absolute);
+            //me_SkeletonReady.Source = new Uri(@"C:\Users\Matt\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Ding.wav", UriKind.Absolute);
+
 
             me_SkeletonOut.LoadedBehavior = MediaState.Manual;
             me_SkeletonOut.UnloadedBehavior = MediaState.Manual;
-            me_SkeletonOut.Source = new Uri(@"C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Fail.wav", UriKind.Absolute);
+            me_SkeletonOut.Source = new Uri(@"C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Fail.wav", UriKind.Absolute);
+            //me_SkeletonOut.Source = new Uri(@"C:\Users\Daniel\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Fail.wav", UriKind.Absolute);
+            //me_SkeletonOut.Source = new Uri(@"C:\Users\Matt\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Fail.wav", UriKind.Absolute);
 
             try
             {
@@ -201,29 +193,9 @@ namespace Programming_For_Kinect_Book
 
             kinectSensor.Start();
 
-            Start();
+            VoiceRecognitionStart();
         }
-
-        //Start streaming audio
-        private void Start()
-        {
-            //set sensor audio source to variable
-            var audioSource = kinectSensor.AudioSource;
-            //Set the beam angle mode - the direction the audio beam is pointing
-            //we want it to be set to adaptive
-            audioSource.BeamAngleMode = BeamAngleMode.Adaptive;
-            //start the audiosource 
-            var kinectStream = audioSource.Start();
-            //configure incoming audio stream
-            speechRecognizer.SetInputToAudioStream(
-                kinectStream, new SpeechAudioFormatInfo(EncodingFormat.Pcm, 16000, 16, 1, 32000, 2, null));
-            //make sure the recognizer does not stop after completing     
-            speechRecognizer.RecognizeAsync(RecognizeMode.Multiple);
-            //reduce background and ambient noise for better accuracy
-            kinectSensor.AudioSource.EchoCancellationMode = EchoCancellationMode.None;
-            kinectSensor.AudioSource.AutomaticGainControlEnabled = false;
-        }
-
+        
         //here is the fun part: create the speech recognizer
         private SpeechRecognitionEngine CreateSpeechRecognizer()
         {
@@ -256,10 +228,41 @@ namespace Programming_For_Kinect_Book
             return sre;
         }
 
+        //Start streaming audio for voice recognition
+        private void VoiceRecognitionStart()
+        {
+            //set sensor audio source to variable
+            var audioSource = kinectSensor.AudioSource;
+            //Set the beam angle mode - the direction the audio beam is pointing
+            //we want it to be set to adaptive
+            audioSource.BeamAngleMode = BeamAngleMode.Adaptive;
+            //start the audiosource 
+            var kinectStream = audioSource.Start();
+            //configure incoming audio stream
+            speechRecognizer.SetInputToAudioStream(kinectStream, new SpeechAudioFormatInfo(EncodingFormat.Pcm, 16000, 16, 1, 32000, 2, null));
+            //make sure the recognizer does not stop after completing     
+            speechRecognizer.RecognizeAsync(RecognizeMode.Multiple);
+            //reduce background and ambient noise for better accuracy
+            kinectSensor.AudioSource.EchoCancellationMode = EchoCancellationMode.None;
+            kinectSensor.AudioSource.AutomaticGainControlEnabled = false;
+        }
+
+        //Get the speech recognizer (SR)
+        private static RecognizerInfo GetKinectRecognizer()
+        {
+            Func<RecognizerInfo, bool> matchingFunc = r =>
+            {
+                string value;
+                r.AdditionalInfo.TryGetValue("Kinect", out value);
+                return "True".Equals(value, StringComparison.InvariantCultureIgnoreCase) && "en-US".Equals(r.Culture.Name, StringComparison.InvariantCultureIgnoreCase);
+            };
+            return SpeechRecognitionEngine.InstalledRecognizers().Where(matchingFunc).FirstOrDefault();
+        }
+
         //if speech is rejected
         private void RejectSpeech(RecognitionResult result)
         {
-             Console.WriteLine("I didn't catch that...");
+            tb_Gestures.Text += Environment.NewLine + "I didn't catch that...";
         }
 
         private void SreSpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
@@ -270,7 +273,7 @@ namespace Programming_For_Kinect_Book
         //hypothesized result
         private void SreSpeechHypothesized(object sender, SpeechHypothesizedEventArgs e)
         {
-            Console.WriteLine("Hypothesized: " + e.Result.Text + " " + e.Result.Confidence);
+            tb_Gestures.Text += Environment.NewLine + "Hypothesized: " + e.Result.Text + " " + e.Result.Confidence;
         }
 
         //Speech is recognised
@@ -278,34 +281,33 @@ namespace Programming_For_Kinect_Book
         {
             //Very important! - change this value to adjust accuracy - the higher the value
             //the more accurate it will have to be, lower it if it is not recognizing you
-            if (e.Result.Confidence < .8)
+            if (e.Result.Confidence < .7)
             {
                 RejectSpeech(e.Result);
             }
-            //and finally, here we set what we want to happen when 
-            //the SRE recognizes a word
+            //and finally, here we set what we want to happen when the SRE recognizes a word
             else
             {
                 switch (e.Result.Text.ToUpperInvariant())
                 {
                     case "TESTING":
-                        Console.WriteLine("You said TESTING.");
+                        tb_Gestures.Text += Environment.NewLine + "You said TESTING.";
                         break;
                     case "EXIT STREET VIEW":
-                        Console.WriteLine("You said EXIT STREET VIEW.");
+                        tb_Gestures.Text += Environment.NewLine + "You said EXIT STREET VIEW.";
                         PressKeyEscape();
                         break;
                     case "GO TO PARIS":
-                        Console.WriteLine("You said GO TO PARIS.");
+                        tb_Gestures.Text += Environment.NewLine + "You said GO TO PARIS.";
                         GoToCityEvent("Paris");
                         break;
                     case "GO TO GAINESVILLE":
-                        Console.WriteLine("You said GO TO GAINESVILLE.");
+                        tb_Gestures.Text += Environment.NewLine + "You said GO TO GAINESVILLE.";
                         GoToCityEvent("Gainesville");
                         break;
 
                     case "RESET":
-                        Console.WriteLine("You said RESET");
+                        tb_Gestures.Text += Environment.NewLine + "You said RESET";
                         resetSkeleton();
                         break;
 
@@ -427,7 +429,7 @@ namespace Programming_For_Kinect_Book
             }
 
             if (!hasUser)
-                tb_Gestures.Text = "No user detected.";
+                tb_Gestures.Text += Environment.NewLine + "No user detected.";
         }
 
         void kinectSensor_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
@@ -436,7 +438,6 @@ namespace Programming_For_Kinect_Book
             {
                 if (frame == null)
                 {
-                    Console.WriteLine("Frame is null!");
                     return;
                 }
 
@@ -444,14 +445,13 @@ namespace Programming_For_Kinect_Book
 
                 if (skeletons.All(s => s.TrackingState == SkeletonTrackingState.NotTracked))
                 {
-                    Console.WriteLine("no skeleton tracked");
                     skeletonManager.EraseCanvas();
                     return;
                 }
 
                 else if (primarySkeleton == null)
                 {
-                    Console.WriteLine("primary skeleton null");
+                    Console.WriteLine("getting new skeleton");
                     primarySkeleton = getPrimarySkeleton(skeletons);
                 }
 
@@ -525,26 +525,6 @@ namespace Programming_For_Kinect_Book
                             // into a bad state.  Ignore the frame in that case.
                         }
 
-                        /*if (needsToBeStabalized)
-                        {
-                            if (skeletonIsReady(primarySkeleton))
-                            {
-                                Console.WriteLine("Skeleton ready after red");
-                                skeletonManager.DrawStable(primarySkeleton);
-                                doGestureDetection();
-                                needsToBeStabalized = false;
-                            }
-                            else
-                            {
-                                skeletonManager.DrawUnstable(primarySkeleton);
-                            }
-                        }
-                        else
-                        {
-                            skeletonManager.DrawStable(primarySkeleton);
-                        }
-                        */
-
 	                }
                 }                 
             }
@@ -585,10 +565,6 @@ namespace Programming_For_Kinect_Book
                     {
                         skeletonToReturn = skeleton;
                         //tb_Gestures.Text += Environment.NewLine + "Primary skeleton ready - id: " + skeletonToReturn.TrackingId;
-                        
-                        
-
-                        
                         tb_Gestures.ScrollToEnd();
                         Console.WriteLine("primary skeleton identified with id: " + skeletonToReturn.TrackingId);
                     }
@@ -615,60 +591,16 @@ namespace Programming_For_Kinect_Book
         private Boolean skeletonIsReady(Skeleton skeleton)
         {
             if (contextTracker.IsStableRelativeToAverageSpeed(skeleton.TrackingId) && contextTracker.IsShouldersTowardsSensor(skeleton)
-                    && contextTracker.IsNotClipped(skeleton))
+                    && contextTracker.IsNotClipped(skeleton) && !isDoingGesture())
                 return true;
             else
                 return false;
 
         }
 
-        private void RenderClippedEdges(Skeleton skeleton)
-        {
-            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Bottom))
-            {
-                //DrawClippedEdges(FrameEdges.Bottom); // Make the border red to show the user is reaching the border
-                //Console.WriteLine("Too close to bottom!");
-            }
-
-            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Top))
-            {
-                //DrawClippedEdges(FrameEdges.Top);
-            }
-
-            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Left))
-            {
-                //DrawClippedEdges(FrameEdges.Left);
-            }
-
-            if (skeleton.ClippedEdges.HasFlag(FrameEdges.Right))
-            {
-                //DrawClippedEdges(FrameEdges.Right);
-            }
-        }
-
         public void doGestureDetection()
         {
             //gestureDetector.Add(primarySkeleton.Joints[JointType.HandRight].Position, kinectSensor);
-
-            //if (primarySkeleton.Joints[JointType.HandRight].Position.Y > primarySkeleton.Joints[JointType.Head].Position.Y
-            //            && primarySkeleton.Joints[JointType.HandLeft].Position.Y > primarySkeleton.Joints[JointType.Head].Position.Y)
-            //{
-                
-            //}
-
-            //if (primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.HandLeft].Position.Z > 0.3f
-            //            && primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.HandRight].Position.Z > 0.3f)
-            //{
-                
-            //    PressKeyLeftArrow();
-            //}
-
-            ////Step backward with one foot
-            //if (primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - stableLeftFootPosition> 0.2f ||
-            //            primarySkeleton.Joints[JointType.AnkleRight].Position.Z - stableRightFootPosition > 0.2f)
-            //{
-            //    PressKeyDownArrow();
-            //}
 
             //Step forward with one foot
             if (primarySkeleton.Joints[JointType.AnkleLeft].Position.Z - primarySkeleton.Joints[JointType.AnkleRight].Position.Z > 0.4f ||
@@ -697,42 +629,84 @@ namespace Programming_For_Kinect_Book
             else if (primarySkeleton.Joints[JointType.ShoulderRight].Position.Z - primarySkeleton.Joints[JointType.ShoulderLeft].Position.Z > 0.1f)
             {
                 PressKeyRightArrow();
-                
             }
                
             //Look up
-            else if (primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.HipCenter].Position.Z > 0.1f)
-                        //&& primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.FootRight].Position.Z > 0.05f)
+            else if (primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.HipCenter].Position.Z > 0.08f)
             {
                 PressKeyCtrlUpArrow();
                 
             }
-            else if (primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z > 0.05f)
-                        //&& primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z - primarySkeleton.Joints[JointType.FootRight].Position.Z > 0.05f)
+            //Look down
+            else if (primarySkeleton.Joints[JointType.HipCenter].Position.Z - primarySkeleton.Joints[JointType.ShoulderCenter].Position.Z > 0.08f)
             {
                 PressKeyCtrlDownArrow();
             }
 
             else
             {
-             
-
                 clearKeyStrokes();
             }
 
         }
 
+        public bool isDoingGesture()
+        {
+            foreach (Skeleton skeleton in skeletons)
+            {
+                if (skeleton.TrackingId != 0)
+                {
+                    //Step forward with one foot
+                    if (skeleton.Joints[JointType.AnkleLeft].Position.Z - skeleton.Joints[JointType.AnkleRight].Position.Z > 0.4f ||
+                                skeleton.Joints[JointType.AnkleRight].Position.Z - skeleton.Joints[JointType.AnkleLeft].Position.Z > 0.4f)
+                    {
+                        return true;
+
+                    }
+                    else if ((skeleton.Joints[JointType.AnkleLeft].Position.Z - skeleton.Joints[JointType.AnkleRight].Position.Z > 0.2f && skeleton.Joints[JointType.AnkleLeft].Position.Z - skeleton.Joints[JointType.AnkleRight].Position.Z < 0.4f) ||
+                            (skeleton.Joints[JointType.AnkleRight].Position.Z - skeleton.Joints[JointType.AnkleLeft].Position.Z > 0.2f && skeleton.Joints[JointType.AnkleRight].Position.Z - skeleton.Joints[JointType.AnkleLeft].Position.Z < 0.4f))
+                    {
+                        return true;
+                    }
+
+                    //Turn shoulders left
+                    else if (skeleton.Joints[JointType.ShoulderLeft].Position.Z - skeleton.Joints[JointType.ShoulderRight].Position.Z > 0.1f)
+                    {
+                        return true;
+                    }
+
+                    //Turn shoulders right
+                    else if (skeleton.Joints[JointType.ShoulderRight].Position.Z - skeleton.Joints[JointType.ShoulderLeft].Position.Z > 0.1f)
+                    {
+                        return true;
+                    }
+
+                    //Look up
+                    else if (skeleton.Joints[JointType.ShoulderCenter].Position.Z - skeleton.Joints[JointType.HipCenter].Position.Z > 0.1f)
+                    {
+                        return true;
+                    }
+                    //Look down
+                    else if (skeleton.Joints[JointType.HipCenter].Position.Z - skeleton.Joints[JointType.ShoulderCenter].Position.Z > 0.05f)
+                    {
+                        return true;
+                    }
+
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return false;
+
+        }
+
         public void clearKeyStrokes() 
         {
-            //if (downKeyStrokes.Count > 0)
-            //{
-            //    tb_Gestures.Text += Environment.NewLine + "Key strokes cleared";
-            //    tb_Gestures.ScrollToEnd();
-            //}
-         
             while(downKeyStrokes.Count > 0)
             {
-                //Console.WriteLine("Removed keystroke: " + downKeyStrokes[0]);
                 InputSimulator.SimulateKeyUp(downKeyStrokes[0]);
                 downKeyStrokes.Remove(downKeyStrokes[0]);
             }
@@ -740,6 +714,8 @@ namespace Programming_For_Kinect_Book
 
         public void GoToCityEvent(String city)
         {
+            tb_Gestures.Text += (Environment.NewLine + "Going to city: " + city);
+            tb_Gestures.ScrollToEnd();
             InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
             InputSimulator.SimulateTextEntry(city);
             InputSimulator.SimulateKeyPress(VirtualKeyCode.RETURN);
@@ -756,20 +732,17 @@ namespace Programming_For_Kinect_Book
                 downKeyStrokes.Remove(key);
                 tb_Gestures.Text += Environment.NewLine + "Current: " + test + " Clearing: " + key.ToString();
             }
-            
         }
 
-        public void PressKeyA()
-        {
-            InputSimulator.SimulateKeyPress(VirtualKeyCode.VK_A);
-        }
-
-
+        //Used for exiting street view
         public void PressKeyEscape()
         {
+            tb_Gestures.Text += (Environment.NewLine + "Exiting street view.");
+            tb_Gestures.ScrollToEnd();
             InputSimulator.SimulateKeyPress(VirtualKeyCode.ESCAPE);
         }
 
+        //Used for walking forward faster
         public void PressKeyEqual()
         {
             if (!InputSimulator.IsKeyDown(VirtualKeyCode.PRIOR))
@@ -779,9 +752,9 @@ namespace Programming_For_Kinect_Book
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.PRIOR);
                 downKeyStrokes.Add(VirtualKeyCode.PRIOR);
             }
-
         }
 
+        //Used for walking forward
         public void PressKeyUpArrow()
         {
             if(!InputSimulator.IsKeyDown(VirtualKeyCode.VK_W))
@@ -793,6 +766,7 @@ namespace Programming_For_Kinect_Book
             }
         }
 
+        //Used for walking backwards (not implemented)
         public void PressKeyDownArrow()
         {
             if (!InputSimulator.IsKeyDown(VirtualKeyCode.VK_S))
@@ -804,6 +778,7 @@ namespace Programming_For_Kinect_Book
             }
         }
 
+        //Used for looking left
         public void PressKeyLeftArrow()
         {
             if(!InputSimulator.IsKeyDown(VirtualKeyCode.LEFT))
@@ -870,23 +845,3 @@ namespace Programming_For_Kinect_Book
         }
     }
 }
-
-//Code we may need later for reference
-
-//var key = Key.A;                    // Key to send
-//var target = Keyboard.FocusedElement;    // Target element
-//var routedEvent = Keyboard.KeyDownEvent; // Event to send
-
-//target.RaiseEvent(
-//  new KeyEventArgs(
-//    Keyboard.PrimaryDevice,
-//    Keyboard.PrimaryDevice.ActiveSource,
-//    0,
-//    key) { RoutedEvent = routedEvent }
-//);
-
-//var eventArgs = new TextCompositionEventArgs(Keyboard.PrimaryDevice,
-//                                            new TextComposition(InputManager.Current, Keyboard.FocusedElement, "A"));
-
-//eventArgs.RoutedEvent = TextInputEvent;
-//InputManager.Current.ProcessInput(eventArgs);

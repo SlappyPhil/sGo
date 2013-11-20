@@ -92,5 +92,29 @@ namespace Kinect.Toolbox
 
             SendInput(inputs.Length, inputs, INPUT.Size);
         }
+
+        public static void ControlMouseAbsolute(int x, int y)
+        {
+            INPUT input = new INPUT();
+            input.type = 0;
+            input.mi.mouseData = 0;
+            input.mi.dx = (int) (x * (65536f / System.Windows.SystemParameters.PrimaryScreenWidth));//x being coord in pixels
+            input.mi.dy = (int) (y * (65536f / System.Windows.SystemParameters.PrimaryScreenHeight));//y being coord in pixels
+            input.mi.dwFlags = MOUSEEVENTF.ABSOLUTE | MOUSEEVENTF.MOVE;
+
+            SendInput(1, new INPUT[] { input }, INPUT.Size);
+            //SendInput(1, &input, INPUT.Size);
+        }
+
+        public static void MoveAbsolute(int x, int y)
+        {
+            INPUT input = new INPUT();
+            input.type = 0;
+            input.mi.dx = x;
+            input.mi.dy = y;
+            input.mi.dwFlags = MOUSEEVENTF.ABSOLUTE;
+
+            SendInput(1, new INPUT[] { input }, INPUT.Size);
+        }
     }
 }

@@ -308,11 +308,11 @@ namespace Programming_For_Kinect_Book
                         break;
                     case "GO TO PARIS":
                         tb_Gestures.Text += Environment.NewLine + "You said GO TO PARIS.";
-                        GoToCityEvent("Paris");
+                        GoToCityEvent("Eiffel Tower, Avenue Anatole France, Paris, France");
                         break;
                     case "GO TO GAINESVILLE":
                         tb_Gestures.Text += Environment.NewLine + "You said GO TO GAINESVILLE.";
-                        GoToCityEvent("Gainesville");
+                        GoToCityEvent("Ben Hill Griffin Stadium, Gale Lemerand Drive, Gainesville, FL");
                         break;
 
                     case "RESET":
@@ -500,10 +500,6 @@ namespace Programming_For_Kinect_Book
         {
             int centerX = (int)(System.Windows.SystemParameters.PrimaryScreenWidth * 0.97); //1536
             int centerY = (int)(System.Windows.SystemParameters.PrimaryScreenHeight * 0.24); //864
-
-            Console.WriteLine("Width is: " + System.Windows.SystemParameters.PrimaryScreenWidth);
-            Console.WriteLine("Height is: " + System.Windows.SystemParameters.PrimaryScreenHeight);
-
             MouseInterop.ControlMouseAbsolute(centerX, centerY);
         }
 
@@ -526,7 +522,6 @@ namespace Programming_For_Kinect_Book
 
                 else if (primarySkeleton == null)
                 {
-                    Console.WriteLine("getting new skeleton");
                     primarySkeleton = getPrimarySkeleton(skeletons);
                 }
 
@@ -543,6 +538,7 @@ namespace Programming_For_Kinect_Book
                         primarySkeleton = null;
 
                         skeletonManager.EraseCanvas();
+                        Console.WriteLine("primary skeleton lost");
 
                         clearKeyStrokes();
                     }
@@ -552,11 +548,20 @@ namespace Programming_For_Kinect_Book
                         if (!lastFrameUnstable)
                         {
                             tb_Gestures.Text += Environment.NewLine + userName + "is lost!";
+
+                            me_SkeletonOut.LoadedBehavior = MediaState.Manual;
+                            me_SkeletonOut.UnloadedBehavior = MediaState.Manual;
+                            me_SkeletonOut.Source = new Uri(@"C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Fail.wav", UriKind.Absolute);
                             me_SkeletonOut.Play();
+
+                            lastFrameUnstable = true;
                         }
                         skeletonManager.DrawUnstable(primarySkeleton);
-                        clearKeyStrokes();
-                        lastFrameUnstable = true;
+                        if (downKeyStrokes.Count > 0)
+                        {
+                            Console.WriteLine("has clipped edges");
+                            clearKeyStrokes();
+                        }
                         //tb_Gestures.Text += Environment.NewLine + "Primary skeleton partially out of view";
                         //tb_Gestures.ScrollToEnd();
 
@@ -569,11 +574,15 @@ namespace Programming_For_Kinect_Book
                         if (lastFrameUnstable)
                         {
                             tb_Gestures.Text += Environment.NewLine + userName + "is ready to explore!";
+                            me_SkeletonOut.LoadedBehavior = MediaState.Manual;
+                            me_SkeletonOut.UnloadedBehavior = MediaState.Manual;
+                            me_SkeletonOut.Source = new Uri(@"C:\Users\Jake\Documents\GitHub\sGo\Programming_For_Kinect_Book\Programming_For_Kinect_Book\Ding.wav", UriKind.Absolute);
+
                             me_SkeletonReady.Play();
+                            lastFrameUnstable = false;
                         }
                         skeletonManager.DrawStable(primarySkeleton);
                         doGestureDetection();
-                        lastFrameUnstable = false;
 
                         try
                         {
@@ -608,6 +617,8 @@ namespace Programming_For_Kinect_Book
         public void resetSkeleton()
         {
             primarySkeleton = null;
+            Console.WriteLine("reset skeleton");
+
             clearKeyStrokes();
         }
 
@@ -683,6 +694,7 @@ namespace Programming_For_Kinect_Book
             {
                 test = "Fast walk";
                 //clearSingleKey(VirtualKeyCode.VK_W); //THESE NEED TO BE HERE BUT ARENT WORKNG RIGHT
+                Console.WriteLine("fast walk");
                 clearKeyStrokes();
                 PressKeyEqual();
 
@@ -733,7 +745,11 @@ namespace Programming_For_Kinect_Book
                 int dy = (int)((leftHandY - mStartGripLeftY) * 1000);
 
                 MouseInterop.ControlMouse(-dx, dy, true);
-                clearKeyStrokes();
+                if (downKeyStrokes.Count > 0)
+                {
+                    Console.WriteLine("left hand grip");
+                    clearKeyStrokes();
+                }
             }
 
             else if (rightHandGripped && !leftHandGripped)
@@ -748,7 +764,11 @@ namespace Programming_For_Kinect_Book
                 int dy = (int)((rightHandY - mStartGripRightY) * 1000);
 
                 MouseInterop.ControlMouse(-dx, dy, true);
-                clearKeyStrokes();
+                if (downKeyStrokes.Count > 0)
+                {
+                    Console.WriteLine("right hand grip");
+                    clearKeyStrokes();
+                }
             }
 
             //else  if (!(rightHandGripped || leftHandGripped))
@@ -758,7 +778,11 @@ namespace Programming_For_Kinect_Book
 
             else
             {
-                clearKeyStrokes();
+                if (downKeyStrokes.Count > 0)
+                {
+                    Console.WriteLine("no gesture detected");
+                    clearKeyStrokes();
+                }
                 MouseInterop.ControlMouse(0, 0, false);
 
             }
@@ -826,7 +850,6 @@ namespace Programming_For_Kinect_Book
                 downKeyStrokes.Remove(downKeyStrokes[0]);
             }
             tb_Gestures.Text += Environment.NewLine + "Clear key strokes";
-
         }
 
 

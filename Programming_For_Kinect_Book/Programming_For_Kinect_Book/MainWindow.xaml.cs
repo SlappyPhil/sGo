@@ -46,6 +46,11 @@ namespace Programming_For_Kinect_Book
         Boolean leftHandGripped = false;
         Boolean rightHandGripped = false;
 
+        private float mStartGripRightX;
+        private float mStartGripRightY;
+        private float mStartGripLeftX;
+        private float mStartGripLeftY;
+
         private Dictionary<int, InteractionHandEventType> _lastLeftHandEvents = new Dictionary<int, InteractionHandEventType>();
         private Dictionary<int, InteractionHandEventType> _lastRightHandEvents = new Dictionary<int, InteractionHandEventType>();
 
@@ -167,6 +172,10 @@ namespace Programming_For_Kinect_Book
 
         private void Initialize()
         {
+
+            mStartGripLeftX = -1;
+            mStartGripLeftY = -1;
+
             if (kinectSensor == null)
                 return;
 
@@ -395,22 +404,37 @@ namespace Programming_For_Kinect_Book
                                                 ? lastHandEvents[userID]
                                                 : InteractionHandEventType.None;
 
+                        // This is set up to ONLY detect the grip of one hand. In other words,
+                        // while one hand is gripped, we don't care if the other hand becomes gripped.
+                        // This is temporary, as we will need to detect two grips for zoom.
                         if (hand.HandType == InteractionHandType.Left)
                             if (lastHandEvent == InteractionHandEventType.Grip)
-                                leftHandGripped = true;
+                            {
+                                // only set grip to true if it will be the first hand gripped
+                                if (!(rightHandGripped || leftHandGripped))
+                                    toggleLeftGrip(true);
+                            }
                             else
-                                leftHandGripped = false;
+                            {
+                                toggleLeftGrip(false);
+                            }
 
                         else if (hand.HandType == InteractionHandType.Right)
                             if (lastHandEvent == InteractionHandEventType.Grip)
-                                rightHandGripped = true;
+                            {
+                                // only set grip to true if it will be the first hand gripped
+                                if (!(leftHandGripped || rightHandGripped))
+                                    toggleRightGrip(true);
+                            }
                             else
-                                rightHandGripped = false;
+                            {
+                                toggleRightGrip(false);
+                            }
 
                         //dump.AppendLine();
                         //dump.AppendLine("    HandType: " + hand.HandType);
                         //dump.AppendLine("    HandEventType: " + hand.HandEventType);
-                        dump.AppendLine("    LastHandEventType: " + lastHandEvent);
+                        //dump.AppendLine("    LastHandEventType: " + lastHandEvent);
                         //dump.AppendLine("    IsActive: " + hand.IsActive);
                         //dump.AppendLine("    IsPrimaryForUser: " + hand.IsPrimaryForUser);
                         //dump.AppendLine("    IsInteractive: " + hand.IsInteractive);
@@ -429,7 +453,58 @@ namespace Programming_For_Kinect_Book
             }
 
             if (!hasUser)
-                tb_Gestures.Text += Environment.NewLine + "No user detected.";
+                tb_Gestures.Text = "No user detected.";
+        }
+
+        private void toggleRightGrip(bool grip)
+        {
+            rightHandGripped = grip;
+
+            if (rightHandGripped)
+            {
+                moveMouseToStreetView();
+
+                // This sets the initial position of the hand when a grab is detected. This
+                // may not be necessary... but it works
+                mStartGripRightX = primarySkeleton.Joints[JointType.HandRight].Position.X;
+                mStartGripRightY = primarySkeleton.Joints[JointType.HandRight].Position.Y;
+            }
+        }
+        private void toggleLeftGrip(bool grip)
+        {
+            leftHandGripped = grip;
+
+            if (leftHandGripped)
+            {
+                moveMouseToCenter();
+
+                // This sets the initial position of the hand when a grab is detected. This
+                // may not be necessary... but it works
+                mStartGripLeftX = primarySkeleton.Joints[JointType.HandLeft].Position.X;
+                mStartGripLeftY = primarySkeleton.Joints[JointType.HandLeft].Position.Y;
+            }
+        }
+
+        private void moveMouseToCenter()
+        {
+            int centerX = (int)(System.Windows.SystemParameters.PrimaryScreenWidth * 0.65); //1536
+            int centerY = (int)(System.Windows.SystemParameters.PrimaryScreenHeight * 0.5); //864
+
+            Console.WriteLine("Width is: " + System.Windows.SystemParameters.PrimaryScreenWidth);
+            Console.WriteLine("Height is: " + System.Windows.SystemParameters.PrimaryScreenHeight);
+
+            MouseInterop.ControlMouseAbsolute(centerX, centerY);
+        }
+
+        private void moveMouseToStreetView()
+        {
+            int centerX = (int)(System.Windows.SystemParameters.PrimaryScreenWidth * 0.97); //1536
+            int centerY = (int)(System.Windows.SystemParameters.PrimaryScreenHeight * 0.24); //864
+
+            Console.WriteLine("Width is: " + System.Windows.SystemParameters.PrimaryScreenWidth);
+            Console.WriteLine("Height is: " + System.Windows.SystemParameters.PrimaryScreenHeight);
+
+            MouseInterop.ControlMouseAbsolute(centerX, centerY);
         }
 
         void kinectSensor_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
@@ -607,7 +682,8 @@ namespace Programming_For_Kinect_Book
                         primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z > 0.4f)
             {
                 test = "Fast walk";
-                clearSingleKey(VirtualKeyCode.VK_W); //THESE NEED TO BE HERE BUT ARENT WORKNG RIGHT
+                //clearSingleKey(VirtualKeyCode.VK_W); //THESE NEED TO BE HERE BUT ARENT WORKNG RIGHT
+                clearKeyStrokes();
                 PressKeyEqual();
 
             }
@@ -615,7 +691,7 @@ namespace Programming_For_Kinect_Book
                     (primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z > 0.2f && primarySkeleton.Joints[JointType.AnkleRight].Position.Z - primarySkeleton.Joints[JointType.AnkleLeft].Position.Z < 0.4f))
             {
                 test = "Slow walk";
-                clearSingleKey(VirtualKeyCode.PRIOR); //THESE NEED TO BE HERE BUT ARENT WORKNG RIGHT
+                //clearSingleKey(VirtualKeyCode.PRIOR); //THESE NEED TO BE HERE BUT ARENT WORKNG RIGHT
                 PressKeyUpArrow();
             }
 
@@ -643,9 +719,48 @@ namespace Programming_For_Kinect_Book
                 PressKeyCtrlDownArrow();
             }
 
+            // We check to see if one hand is gripped and not the other for panning.
+            // For now, this is always the case.
+            else if (leftHandGripped && !rightHandGripped)
+            {
+                float leftHandX = mStartGripLeftX;
+                float leftHandY = mStartGripLeftY;
+
+                mStartGripLeftX = primarySkeleton.Joints[JointType.HandLeft].Position.X;
+                mStartGripLeftY = primarySkeleton.Joints[JointType.HandLeft].Position.Y;
+
+                int dx = (int)((leftHandX - mStartGripLeftX) * 1000);
+                int dy = (int)((leftHandY - mStartGripLeftY) * 1000);
+
+                MouseInterop.ControlMouse(-dx, dy, true);
+                clearKeyStrokes();
+            }
+
+            else if (rightHandGripped && !leftHandGripped)
+            {
+                float rightHandX = mStartGripRightX;
+                float rightHandY = mStartGripRightY;
+
+                mStartGripRightX = primarySkeleton.Joints[JointType.HandRight].Position.X;
+                mStartGripRightY = primarySkeleton.Joints[JointType.HandRight].Position.Y;
+
+                int dx = (int)((rightHandX - mStartGripRightX) * 1000);
+                int dy = (int)((rightHandY - mStartGripRightY) * 1000);
+
+                MouseInterop.ControlMouse(-dx, dy, true);
+                clearKeyStrokes();
+            }
+
+            //else  if (!(rightHandGripped || leftHandGripped))
+            //{
+                //MouseInterop.ControlMouse(0, 0, false);
+            //}
+
             else
             {
                 clearKeyStrokes();
+                MouseInterop.ControlMouse(0, 0, false);
+
             }
 
         }
@@ -710,7 +825,10 @@ namespace Programming_For_Kinect_Book
                 InputSimulator.SimulateKeyUp(downKeyStrokes[0]);
                 downKeyStrokes.Remove(downKeyStrokes[0]);
             }
+            tb_Gestures.Text += Environment.NewLine + "Clear key strokes";
+
         }
+
 
         public void GoToCityEvent(String city)
         {
@@ -749,6 +867,7 @@ namespace Programming_For_Kinect_Book
             {
                 tb_Gestures.Text += (Environment.NewLine + "Step forward fast.");
                 tb_Gestures.ScrollToEnd();
+                InputSimulator.SimulateKeyUp(VirtualKeyCode.VK_W);
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.PRIOR);
                 downKeyStrokes.Add(VirtualKeyCode.PRIOR);
             }
@@ -761,6 +880,7 @@ namespace Programming_For_Kinect_Book
             {
                 tb_Gestures.Text += (Environment.NewLine + "Step forward normal.");
                 tb_Gestures.ScrollToEnd();
+                InputSimulator.SimulateKeyUp(VirtualKeyCode.PRIOR);
                 InputSimulator.SimulateKeyDown(VirtualKeyCode.VK_W);
                 downKeyStrokes.Add(VirtualKeyCode.VK_W);
             }
